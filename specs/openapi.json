@@ -757,6 +757,14 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "metadata.{key}",
+            "in": "query",
+            "description": "Filter by a machine metadata key and exact value. Replace {key} with the metadata key, for example metadata.foo=bar. Specify multiple metadata filters to require all matches.",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
