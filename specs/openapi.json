@@ -656,7 +656,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IPAssignment"
+                  "$ref": "#/components/schemas/AssignIPResponse"
                 }
               }
             }
@@ -5451,6 +5451,38 @@
           }
         }
       },
+      "AssignIPResponse": {
+        "type": "object",
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "egress": {
+            "type": "boolean"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "ip_pair": {
+            "type": "object",
+            "description": "ip_pair is returned when \"egress-pair\" IP type is requested; in this case, ip is null.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/IPPair"
+              }
+            ]
+          },
+          "region": {
+            "type": "string"
+          },
+          "service_name": {
+            "type": "string"
+          },
+          "shared": {
+            "type": "boolean"
+          }
+        }
+      },
       "CertificateCheckResponse": {
         "type": "object",
         "properties": {
@@ -6003,6 +6035,9 @@
           "created_at": {
             "type": "string"
           },
+          "egress": {
+            "type": "boolean"
+          },
           "ip": {
             "type": "string"
           },
@@ -6014,6 +6049,39 @@
           },
           "shared": {
             "type": "boolean"
+          }
+        }
+      },
+      "IPAssignmentType": {
+        "type": "string",
+        "description": "Type of IP address to allocate. \"egress-pair\" allocates both v4 and v6 egress IP addresses (recommended when using egress IPs).",
+        "enum": [
+          "v4",
+          "v6",
+          "shared_v4",
+          "private_v6",
+          "egress_v4",
+          "egress_v6",
+          "egress_pair"
+        ],
+        "x-enum-varnames": [
+          "IPAssignmentType_v4",
+          "IPAssignmentType_v6",
+          "IPAssignmentType_shared_v4",
+          "IPAssignmentType_private_v6",
+          "IPAssignmentType_egress_v4",
+          "IPAssignmentType_egress_v6",
+          "IPAssignmentType_egress_pair"
+        ]
+      },
+      "IPPair": {
+        "type": "object",
+        "properties": {
+          "v4": {
+            "type": "string"
+          },
+          "v6": {
+            "type": "string"
           }
         }
       },
@@ -7251,7 +7319,7 @@
             "type": "string"
           },
           "type": {
-            "type": "string"
+            "$ref": "#/components/schemas/IPAssignmentType"
           }
         }
       },
@@ -9029,11 +9097,13 @@
         "enum": [
           "unknown",
           "insufficient_capacity",
+          "volume_placement_capacity",
           "name_taken"
         ],
         "x-enum-varnames": [
           "unknown",
           "capacityErr",
+          "volumePlacementCapacityErr",
           "nameTakenErr"
         ]
       },
