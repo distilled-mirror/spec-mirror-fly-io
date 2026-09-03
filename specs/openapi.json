@@ -5472,6 +5472,9 @@
               }
             ]
           },
+          "network": {
+            "$ref": "#/components/schemas/IPAssignmentNetwork"
+          },
           "region": {
             "type": "string"
           },
@@ -6041,6 +6044,9 @@
           "ip": {
             "type": "string"
           },
+          "network": {
+            "$ref": "#/components/schemas/IPAssignmentNetwork"
+          },
           "region": {
             "type": "string"
           },
@@ -6051,6 +6057,19 @@
             "type": "boolean"
           }
         }
+      },
+      "IPAssignmentNetwork": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Network name; empty for the organization's default network."
+          },
+          "org_slug": {
+            "type": "string"
+          }
+        },
+        "description": "The 6PN network a Flycast (private_v6) address belongs to. Null for all other IP types."
       },
       "IPAssignmentType": {
         "type": "string",
