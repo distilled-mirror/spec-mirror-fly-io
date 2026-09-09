@@ -5715,6 +5715,10 @@
           "enable_subdomains": {
             "type": "boolean"
           },
+          "idempotency_key": {
+            "type": "string",
+            "description": "When set, makes a retry of this exact request safe: a\nsecond create with the same key and the same name (or no name) returns\nthe app the first request created, instead of erroring on a false name\nconflict or creating a duplicate. A second create with the same key\nbut a *different* name is rejected outright; it won't silently\nhand back the first app."
+          },
           "name": {
             "type": "string"
           },
