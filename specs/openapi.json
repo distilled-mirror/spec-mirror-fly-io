@@ -588,7 +588,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateAppResponse"
+                  "$ref": "#/components/schemas/CreateAppDeployTokenResponse"
                 }
               }
             }
@@ -5725,6 +5725,14 @@
           }
         }
       },
+      "CreateAppDeployTokenResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
       "CreateAppRequest": {
         "type": "object",
         "properties": {
@@ -5749,7 +5757,10 @@
       "CreateAppResponse": {
         "type": "object",
         "properties": {
-          "token": {
+          "created_at": {
+            "type": "integer"
+          },
+          "id": {
             "type": "string"
           }
         }
