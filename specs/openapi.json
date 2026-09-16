@@ -3705,7 +3705,7 @@
           {
             "name": "org_slug",
             "in": "query",
-            "description": "Fly Organization Slug",
+            "description": "Fly Organization Slug, or 'personal' for the caller's personal organization",
             "required": true,
             "schema": {
               "type": "string"
@@ -3732,7 +3732,17 @@
             }
           },
           "400": {
-            "description": "org_slug is required",
+            "description": "org_slug is required and must be a string",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -3761,14 +3771,19 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
       },
       "post": {
         "tags": [
           "Postgres Clusters"
         ],
         "summary": "Create Postgres Cluster",
-        "description": "Create a Managed Postgres cluster for the organization named in the request body. Provisioning is asynchronous, and a name is generated when one is not supplied.",
+        "description": "Create a Managed Postgres cluster for the organization named in the request body. Provisioning is asynchronous: poll `GET /v1/postgres/{id}` until `status == ready` before calling database, user, extension, or credential endpoints.",
         "operationId": "Postgres_create",
         "requestBody": {
           "description": "Cluster details",
@@ -3793,7 +3808,17 @@
             }
           },
           "400": {
-            "description": "Creation failed",
+            "description": "org_slug is required and must be a string, or creation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -3823,6 +3848,11 @@
             }
           }
         },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -3856,6 +3886,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Cluster not found",
             "content": {
@@ -3866,7 +3906,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
       },
       "delete": {
         "tags": [
@@ -3891,6 +3936,16 @@
             "description": "Accepted",
             "content": {}
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Cluster not found",
             "content": {
@@ -3911,7 +3966,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
       }
     },
     "/v1/postgres/{postgres_cluster_id}/attachments": {
@@ -3920,7 +3980,7 @@
           "Postgres Clusters"
         ],
         "summary": "Attach Cluster to App",
-        "description": "Attach a specific cluster to a Fly app. The attachment is created if it does not already exist.",
+        "description": "Record an attachment between a cluster and a Fly app. This endpoint records the relationship but does not set DATABASE_URL or other app secrets; configure the connection string separately. The attachment is created if it does not already exist.",
         "operationId": "Postgres_attachments_create",
         "parameters": [
           {
@@ -3965,6 +4025,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "'Cluster not found' for the cluster; 'App not found' for the app",
             "content": {
@@ -3986,6 +4056,11 @@
             }
           }
         },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -4022,6 +4097,16 @@
             "description": "No Content",
             "content": {}
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "'Cluster not found' for the cluster; 'App not found' for the app; 'Attachment not found' for the attachment",
             "content": {
@@ -4042,7 +4127,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
       }
     },
     "/v1/postgres/{postgres_cluster_id}/backups": {
@@ -4075,6 +4165,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Cluster not found",
             "content": {
@@ -4085,7 +4185,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -4121,6 +4226,16 @@
             "description": "Accepted",
             "content": {}
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Cluster not found",
             "content": {
@@ -4142,6 +4257,11 @@
             }
           }
         },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -4175,6 +4295,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Cluster not found",
             "content": {
@@ -4184,8 +4314,23 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "pg-admin is unavailable; retry after the interval given by the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -4237,6 +4382,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Cluster not found",
             "content": {
@@ -4256,8 +4411,23 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "pg-admin is unavailable; retry after the interval given by the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
           }
         },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -4310,6 +4480,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "'Cluster not found' for the cluster; 'Database not found' for the database",
             "content": {
@@ -4319,8 +4499,23 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "pg-admin is unavailable; retry after the interval given by the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
       }
     },
     "/v1/postgres/{postgres_cluster_id}/databases/{database_name}/extensions": {
@@ -4372,6 +4567,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Cluster not found",
             "content": {
@@ -4381,8 +4586,23 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "pg-admin is unavailable; retry after the interval given by the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -4437,6 +4657,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Cluster not found",
             "content": {
@@ -4466,8 +4696,23 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "pg-admin is unavailable; retry after the interval given by the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
           }
         },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -4531,6 +4776,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Cluster not found",
             "content": {
@@ -4550,8 +4805,23 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "pg-admin is unavailable; retry after the interval given by the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
       }
     },
     "/v1/postgres/{postgres_cluster_id}/fork": {
@@ -4605,6 +4875,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Cluster not found",
             "content": {
@@ -4646,6 +4926,11 @@
             }
           }
         },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -4700,6 +4985,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "'Cluster not found' for the cluster; 'Backup <backup_id> not found for cluster <postgres_cluster_id>' for the backup",
             "content": {
@@ -4721,6 +5016,11 @@
             }
           }
         },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -4754,6 +5054,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Cluster not found",
             "content": {
@@ -4763,8 +5073,23 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "pg-admin is unavailable; retry after the interval given by the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -4816,6 +5141,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Cluster not found",
             "content": {
@@ -4845,8 +5180,23 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "pg-admin is unavailable; retry after the interval given by the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
           }
         },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -4893,6 +5243,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "'Cluster not found' for the cluster; 'User not found' for the user",
             "content": {
@@ -4902,8 +5262,23 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "pg-admin is unavailable; retry after the interval given by the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
       },
       "patch": {
         "tags": [
@@ -4958,6 +5333,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "'Cluster not found' for the cluster; 'User not found' for the user",
             "content": {
@@ -4977,8 +5362,23 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "pg-admin is unavailable; retry after the interval given by the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
           }
         },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -5031,6 +5431,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "'Cluster not found' for the cluster; 'User not found' for the user",
             "content": {
@@ -5040,8 +5450,23 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "pg-admin is unavailable; retry after the interval given by the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
           }
-        }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
       }
     },
     "/v1/postgres/{postgres_cluster_id}/users/{username}/rotate_password": {
@@ -5104,6 +5529,16 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "404": {
             "description": "'Cluster not found' for the cluster; 'User not found' for the user",
             "content": {
@@ -5133,8 +5568,23 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "pg-admin is unavailable; retry after the interval given by the Retry-After header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
           }
         },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -6653,7 +7103,8 @@
           },
           "created_at": {
             "type": "string",
-            "description": "RFC 3339 creation timestamp."
+            "description": "RFC 3339 creation timestamp.",
+            "format": "date-time"
           },
           "disk_size_gb": {
             "type": "integer",
@@ -6761,7 +7212,8 @@
           },
           "created_at": {
             "type": "string",
-            "description": "RFC 3339 creation timestamp."
+            "description": "RFC 3339 creation timestamp.",
+            "format": "date-time"
           },
           "deleted_at": {
             "type": "string",
@@ -6851,12 +7303,20 @@
           },
           "installed": {
             "type": "object",
-            "description": "Installation details, or null when the extension is not installed.",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/PostgresInstalledExtension"
+            "properties": {
+              "schema": {
+                "type": "string",
+                "description": "Schema the extension is installed into.",
+                "example": "public"
+              },
+              "version": {
+                "type": "string",
+                "description": "Installed version.",
+                "example": "1.0"
               }
-            ]
+            },
+            "description": "Installation details, or null when the extension is not installed.",
+            "nullable": true
           },
           "name": {
             "type": "string",
@@ -7484,7 +7944,7 @@
           },
           "org_slug": {
             "type": "string",
-            "description": "Slug of the organization that will own the cluster.",
+            "description": "Slug of the organization that will own the cluster, or \"personal\" for the caller's personal organization.",
             "example": "my-org"
           },
           "pg_major_version": {
@@ -7498,7 +7958,7 @@
           },
           "plan": {
             "type": "string",
-            "description": "Plan slug selecting CPU, memory, and disk sizing.",
+            "description": "Plan slug selecting CPU, memory, and disk sizing. Matched case-insensitively.",
             "example": "basic",
             "enum": [
               "basic",
@@ -9358,6 +9818,14 @@
             "type": "string"
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "FlyBearerAuth": {
+        "type": "apiKey",
+        "description": "A Fly API token with access to the requested organization or resource. Send it as `Authorization: Bearer <Fly API token>`.",
+        "name": "Authorization",
+        "in": "header"
       }
     }
   },
