@@ -4934,6 +4934,183 @@
         "x-codegen-request-body-name": "request"
       }
     },
+    "/v1/postgres/{postgres_cluster_id}/queries/active": {
+      "get": {
+        "tags": [
+          "Postgres Clusters"
+        ],
+        "summary": "List Active Queries",
+        "description": "List active queries in the supplied database. The database query parameter is required and must not be empty or whitespace-only. Returns full query text and durations in seconds.",
+        "operationId": "Postgres_queries_active",
+        "parameters": [
+          {
+            "name": "postgres_cluster_id",
+            "in": "path",
+            "description": "Managed Postgres Cluster ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "database",
+            "in": "query",
+            "description": "Database to inspect (must not be empty or whitespace-only)",
+            "required": true,
+            "schema": {
+              "minLength": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/listPostgresActiveQueriesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cluster not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "database must be a non-empty string",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unable to load active queries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/postgres/{postgres_cluster_id}/queries/slow": {
+      "get": {
+        "tags": [
+          "Postgres Clusters"
+        ],
+        "summary": "List Slow Queries",
+        "description": "List the top 20 queries by cumulative total execution time, excluding the postgres database. Uses the latest available metrics within the lookback range; statistics are cumulative PostgreSQL counters, not deltas over that range. Returns full query text and execution times in seconds.",
+        "operationId": "Postgres_queries_slow",
+        "parameters": [
+          {
+            "name": "postgres_cluster_id",
+            "in": "path",
+            "description": "Managed Postgres Cluster ID",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "range",
+            "in": "query",
+            "description": "Metrics lookback in seconds",
+            "schema": {
+              "maximum": 604800,
+              "minimum": 1,
+              "type": "integer",
+              "default": 3600
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/listPostgresSlowQueriesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Cluster not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "range must be an integer between 1 and 604800 seconds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unable to load slow query metrics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "FlyBearerAuth": []
+          }
+        ]
+      }
+    },
     "/v1/postgres/{postgres_cluster_id}/restore": {
       "post": {
         "tags": [
@@ -6700,6 +6877,12 @@
               "$ref": "#/components/schemas/MachineEvent"
             }
           },
+          "host_features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "host_status": {
             "type": "string",
             "enum": [
@@ -6928,6 +7111,12 @@
           "fstype": {
             "type": "string"
           },
+          "host_features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "host_status": {
             "type": "string",
             "enum": [
@@ -6944,6 +7133,12 @@
           },
           "region": {
             "type": "string"
+          },
+          "required_host_features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "size_gb": {
             "type": "integer"
@@ -7013,6 +7208,55 @@
           },
           "org_value": {
             "type": "string"
+          }
+        }
+      },
+      "PostgresActiveQuery": {
+        "type": "object",
+        "properties": {
+          "application_name": {
+            "type": "string",
+            "description": "Application connected to the backend."
+          },
+          "client": {
+            "type": "string",
+            "description": "Client address."
+          },
+          "database": {
+            "type": "string",
+            "description": "Database name."
+          },
+          "duration_seconds": {
+            "type": "number",
+            "description": "Query duration in seconds."
+          },
+          "pid": {
+            "type": "integer",
+            "description": "Process ID of the backend running the query."
+          },
+          "query": {
+            "type": "string",
+            "description": "Full query text."
+          },
+          "state": {
+            "type": "string",
+            "description": "Current backend state."
+          },
+          "state_duration_seconds": {
+            "type": "number",
+            "description": "Time spent in the current state, in seconds."
+          },
+          "user": {
+            "type": "string",
+            "description": "User running the query."
+          },
+          "wait_event": {
+            "type": "string",
+            "description": "Event the backend is waiting for."
+          },
+          "wait_event_type": {
+            "type": "string",
+            "description": "Type of event the backend is waiting for."
           }
         }
       },
@@ -7376,6 +7620,43 @@
                 "$ref": "#/components/schemas/PostgresEndpoint"
               }
             ]
+          }
+        }
+      },
+      "PostgresSlowQuery": {
+        "type": "object",
+        "properties": {
+          "calls": {
+            "type": "integer",
+            "description": "Cumulative number of executions."
+          },
+          "database": {
+            "type": "string",
+            "description": "Database name."
+          },
+          "max_exec_time_seconds": {
+            "type": "number",
+            "description": "Maximum execution time in seconds."
+          },
+          "mean_exec_time_seconds": {
+            "type": "number",
+            "description": "Mean execution time in seconds."
+          },
+          "query": {
+            "type": "string",
+            "description": "Full query pattern."
+          },
+          "query_id": {
+            "type": "string",
+            "description": "Query identifier."
+          },
+          "total_exec_time_seconds": {
+            "type": "number",
+            "description": "Cumulative total execution time in seconds."
+          },
+          "user": {
+            "type": "string",
+            "description": "User running the query."
           }
         }
       },
@@ -7744,6 +8025,12 @@
           "fstype": {
             "type": "string"
           },
+          "host_features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "host_status": {
             "type": "string",
             "enum": [
@@ -7760,6 +8047,12 @@
           },
           "region": {
             "type": "string"
+          },
+          "required_host_features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "size_gb": {
             "type": "integer"
@@ -8717,6 +9010,12 @@
               "always",
               "restart"
             ]
+          },
+          "required_host_features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -9330,6 +9629,17 @@
           }
         }
       },
+      "listPostgresActiveQueriesResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostgresActiveQuery"
+            }
+          }
+        }
+      },
       "listPostgresBackupsResponse": {
         "type": "object",
         "properties": {
@@ -9370,6 +9680,17 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PostgresExtension"
+            }
+          }
+        }
+      },
+      "listPostgresSlowQueriesResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostgresSlowQuery"
             }
           }
         }
