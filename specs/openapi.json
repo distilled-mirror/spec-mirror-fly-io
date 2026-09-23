@@ -771,11 +771,35 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Value of the fly-next-cursor response header from the previous page. Requires limit.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of machines to fetch (must be between 1 and 1000). Providing a limit enables pagination. This limit is advisory; responses may be shorter, or even empty, even when more machines remain.",
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "fly-next-cursor": {
+                "description": "Pagination cursor for the next page. Absent when no more machines remain. Cursor expires 30 minutes after the first page was requested.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -861,6 +885,14 @@
             }
           },
           {
+            "name": "version",
+            "in": "query",
+            "description": "26-character Machine version ID; returns that version of the Machine instead of the current one",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "include_leases",
             "in": "query",
             "description": "Include machine lease",
@@ -933,6 +965,16 @@
           },
           "400": {
             "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
             "content": {
               "application/json": {
                 "schema": {
@@ -1491,9 +1533,9 @@
         "tags": [
           "Machines"
         ],
-        "summary": "Update Metadata (set/remove multiple keys)",
-        "description": "Update multiple metadata keys at once. Null values and empty strings remove keys.\n+ If `machine_version` is provided and no longer matches the current machine version, returns 412 Precondition Failed.",
-        "operationId": "Machines_update_metadata",
+        "summary": "Update Metadata (deprecated PUT alias of PATCH)",
+        "description": "Deprecated: use `PATCH` on the same path, which this is identical to.\n+ Despite the method, this does not replace the metadata: keys that are not in the request are left untouched. Null values and empty strings remove keys.\n+ If `machine_version` is provided and no longer matches the current machine version, returns 412 Precondition Failed.",
+        "operationId": "Machines_update_metadata_deprecated",
         "parameters": [
           {
             "name": "app_name",
@@ -1551,6 +1593,7 @@
             }
           }
         },
+        "deprecated": true,
         "x-codegen-request-body-name": "request"
       },
       "patch": {
@@ -1558,7 +1601,7 @@
           "Machines"
         ],
         "summary": "Update Metadata (set/remove multiple keys)",
-        "description": "Update multiple metadata keys at once. Null values and empty strings remove keys.\n+ If `machine_version` is provided and no longer matches the current machine version, returns 412 Precondition Failed.",
+        "description": "Update multiple metadata keys at once. Keys that are not in the request are left untouched. Null values and empty strings remove keys.\n+ If `machine_version` is provided and no longer matches the current machine version, returns 412 Precondition Failed.",
         "operationId": "Machines_update_metadata",
         "parameters": [
           {
@@ -6902,7 +6945,7 @@
           },
           "instance_id": {
             "type": "string",
-            "description": "InstanceID is unique for each version of the machine"
+            "description": "InstanceID is the same value as `version`.\n\nDeprecated: use `version`."
           },
           "lease": {
             "$ref": "#/components/schemas/StrippedLease"
@@ -6926,6 +6969,10 @@
           },
           "updated_at": {
             "type": "string"
+          },
+          "version": {
+            "type": "string",
+            "description": "Version is unique for each version of the machine. Pass it as\n`current_version` when updating the Machine to reject the update if the\nMachine has changed since this version."
           }
         }
       },
@@ -7931,7 +7978,8 @@
             ]
           },
           "current_version": {
-            "type": "string"
+            "type": "string",
+            "description": "CurrentVersion is an optional optimistic-concurrency guard: the Machine's\n`version`, as returned by create, get or a previous update. When set\nand it is no longer the Machine's current version, the update is rejected\nwith 409 Conflict and nothing changes. Omit it to update unconditionally."
           },
           "lease_ttl": {
             "type": "integer"
