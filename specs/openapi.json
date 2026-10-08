@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.1.0",
   "info": {
     "title": "Machines API",
     "description": "This site hosts documentation generated from the Fly.io Machines API OpenAPI specification. Visit our complete [Machines API docs](https://fly.io/docs/machines/api/) for how to get started, more information about each endpoint, parameter descriptions, and examples.",
@@ -16,6 +16,11 @@
   "servers": [
     {
       "url": "https://api.machines.dev"
+    }
+  ],
+  "security": [
+    {
+      "FlyBearerAuth": []
     }
   ],
   "tags": [
@@ -66,6 +71,22 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of apps to fetch (must be between 1 and 5000). Providing a limit enables pagination. Without it, all apps are returned in one response.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Value of next_cursor from the previous page. Requires limit. Later pages only include apps that existed when the first page was requested. Apps created in the seconds before the first page was requested may be missing. Cursors expire 30 minutes after the first page was requested.",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -75,6 +96,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ListAppsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -807,6 +838,16 @@
                   "items": {
                     "$ref": "#/components/schemas/Machine"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -3163,11 +3204,35 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Value of the fly-next-cursor response header from the previous page. Requires limit.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The number of volumes to fetch (must be between 1 and 1000). Providing a limit enables pagination. This limit is advisory; responses may be shorter, or even empty, even when more volumes remain.",
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK",
+            "headers": {
+              "fly-next-cursor": {
+                "description": "Pagination cursor for the next page. Absent when no more volumes remain. Cursor expires 30 minutes after the first page was requested.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -3175,6 +3240,16 @@
                   "items": {
                     "$ref": "#/components/schemas/Volume"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -3733,7 +3808,8 @@
               }
             }
           }
-        }
+        },
+        "security": []
       }
     },
     "/v1/postgres": {
@@ -3814,12 +3890,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
@@ -3891,11 +3962,6 @@
             }
           }
         },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -3949,12 +4015,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       },
       "delete": {
         "tags": [
@@ -4009,12 +4070,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       }
     },
     "/v1/postgres/{postgres_cluster_id}/attachments": {
@@ -4099,11 +4155,6 @@
             }
           }
         },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -4170,12 +4221,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       }
     },
     "/v1/postgres/{postgres_cluster_id}/backups": {
@@ -4228,12 +4274,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
@@ -4300,11 +4341,6 @@
             }
           }
         },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -4368,12 +4404,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
@@ -4466,11 +4497,6 @@
             }
           }
         },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -4553,12 +4579,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       }
     },
     "/v1/postgres/{postgres_cluster_id}/databases/{database_name}/extensions": {
@@ -4640,12 +4661,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
@@ -4751,11 +4767,6 @@
             }
           }
         },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -4859,12 +4870,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       }
     },
     "/v1/postgres/{postgres_cluster_id}/fork": {
@@ -4969,11 +4975,6 @@
             }
           }
         },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -5057,12 +5058,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       }
     },
     "/v1/postgres/{postgres_cluster_id}/queries/slow": {
@@ -5146,12 +5142,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       }
     },
     "/v1/postgres/{postgres_cluster_id}/restore": {
@@ -5236,11 +5227,6 @@
             }
           }
         },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -5304,12 +5290,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       },
       "post": {
         "tags": [
@@ -5412,11 +5393,6 @@
             }
           }
         },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -5493,12 +5469,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       },
       "patch": {
         "tags": [
@@ -5594,11 +5565,6 @@
             }
           }
         },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -5681,12 +5647,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ]
+        }
       }
     },
     "/v1/postgres/{postgres_cluster_id}/users/{username}/rotate_password": {
@@ -5800,11 +5761,6 @@
             }
           }
         },
-        "security": [
-          {
-            "FlyBearerAuth": []
-          }
-        ],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -5852,6 +5808,7 @@
             }
           }
         },
+        "security": [],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -5906,6 +5863,7 @@
             }
           }
         },
+        "security": [],
         "x-codegen-request-body-name": "request"
       }
     },
@@ -5957,7 +5915,6 @@
           "Tokens"
         ],
         "summary": "Request a Petsem token for accessing KMS",
-        "description": "This site hosts documentation generated from the Fly.io Machines API OpenAPI specification. Visit our complete [Machines API docs](https://fly.io/docs/machines/api/apps-resource/) for details about using the Apps resource.",
         "operationId": "Tokens_request_Kms",
         "responses": {
           "200": {
@@ -6880,8 +6837,13 @@
               "$ref": "#/components/schemas/App"
             }
           },
+          "next_cursor": {
+            "type": "string",
+            "description": "Pagination cursor for the next page. Absent when no more apps remain.\nCursors expire 30 minutes after the first page was requested."
+          },
           "total_apps": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The number of apps matching the request, across all pages. When\npaginating, it is counted once when the first page is requested and not\nupdated afterwards, so it may differ slightly from the number of apps\nreturned: it excludes apps created later and includes apps deleted while\npaginating. Apps created in the seconds before the first page may also be\ncounted but missing from the pages."
           }
         }
       },
@@ -7476,15 +7438,19 @@
             ]
           },
           "storage_provisioned_bytes": {
-            "type": "integer",
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "Storage provisioned, summed across the cluster's volumes and measured hourly.\nNull until first measured.",
-            "nullable": true,
             "example": 10737418240
           },
           "storage_used_bytes": {
-            "type": "integer",
+            "type": [
+              "integer",
+              "null"
+            ],
             "description": "Storage used, summed across the cluster's volumes and measured hourly. Null\nuntil first measured.",
-            "nullable": true,
             "example": 5368709120
           }
         }
@@ -7605,7 +7571,10 @@
             "description": "Human-readable description."
           },
           "installed": {
-            "type": "object",
+            "type": [
+              "object",
+              "null"
+            ],
             "properties": {
               "schema": {
                 "type": "string",
@@ -7618,8 +7587,7 @@
                 "example": "1.0"
               }
             },
-            "description": "Installation details, or null when the extension is not installed.",
-            "nullable": true
+            "description": "Installation details, or null when the extension is not installed."
           },
           "name": {
             "type": "string",
@@ -10060,7 +10028,8 @@
       "placement.Weights": {
         "type": "object",
         "additionalProperties": {
-          "type": "integer"
+          "type": "integer",
+          "format": "int64"
         }
       },
       "postgresDatabaseResponse": {
@@ -10073,6 +10042,7 @@
       },
       "resset.Action": {
         "type": "integer",
+        "format": "int32",
         "enum": [
           1,
           2,
@@ -10203,10 +10173,9 @@
     },
     "securitySchemes": {
       "FlyBearerAuth": {
-        "type": "apiKey",
-        "description": "A Fly API token with access to the requested organization or resource. Send it as `Authorization: Bearer <Fly API token>`.",
-        "name": "Authorization",
-        "in": "header"
+        "type": "http",
+        "scheme": "bearer",
+        "description": "A Fly API token with access to the requested organization or resource. Send it as `Authorization: Bearer <Fly API token>`."
       }
     }
   },
