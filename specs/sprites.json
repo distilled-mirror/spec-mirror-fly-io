@@ -97,6 +97,26 @@
         ],
         "type": "object"
       },
+      "ProviderNote": {
+        "description": "Connector provider note",
+        "properties": {
+          "body": {
+            "description": "Note body. Backticks mark inline code.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Note title.",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "type": "object"
+      },
       "ServiceLogCompleteEvent": {
         "example": {
           "log_files": {
@@ -1180,7 +1200,7 @@
             "type": "string"
           },
           "notes": {
-            "description": "Provider notes about this connection, derived from its saved settings. Each has a nullable `title` and a `body`; backticks mark inline code.",
+            "description": "Provider notes about this connection, derived from its saved settings.",
             "example": [
               {
                 "title": null,
@@ -1188,7 +1208,7 @@
               }
             ],
             "items": {
-              "type": "object"
+              "$ref": "#/components/schemas/ProviderNote"
             },
             "type": "array"
           },
@@ -1709,7 +1729,7 @@
   "info": {
     "title": "Sprites API",
     "version": "0.1.12",
-    "x-sprite-env-version": "v0.0.1-rc48"
+    "x-sprite-env-version": "0.0.1-rc48"
   },
   "openapi": "3.1.0",
   "paths": {

@@ -7207,6 +7207,48 @@
         "inputFields": null,
         "enumValues": [
           {
+            "name": "HTTP_IPV6_REQUIRED",
+            "description": "HTTP validation requires IPv6 access to your app",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "OWNERSHIP_VERIFICATION_REQUIRED",
+            "description": "Domain ownership verification is required for HTTP validation behind a CDN or proxy",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "HTTP_HOSTNAME_MISMATCH",
+            "description": "Hostname does not match the certificate request",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DNS_VALIDATION_FAILED",
+            "description": "DNS validation for Let's Encrypt certificate failed",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ACME_DNS_TXT_CONFLICT",
+            "description": "TXT records returned for _acme-challenge do not match the configured CNAME target",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ACME_DNS_TXT_CONFLICT_CLOUDFLARE",
+            "description": "Cloudflare is adding TXT records that conflict with ACME DNS validation",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DNS_TIMEOUT",
+            "description": "DNS resolution timed out",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "IPV6_NOT_FOUND",
             "description": "No AAAA records were found for your domain",
             "isDeprecated": false,
@@ -7275,48 +7317,6 @@
           {
             "name": "CAA_RECORD_MISSING_FLY",
             "description": "CAA records for Let's Encrypt are missing Fly's account URI",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "HTTP_IPV6_REQUIRED",
-            "description": "HTTP validation requires IPv6 access to your app",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "OWNERSHIP_VERIFICATION_REQUIRED",
-            "description": "Domain ownership verification is required for HTTP validation behind a CDN or proxy",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "HTTP_HOSTNAME_MISMATCH",
-            "description": "Hostname does not match the certificate request",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "DNS_VALIDATION_FAILED",
-            "description": "DNS validation for Let's Encrypt certificate failed",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "ACME_DNS_TXT_CONFLICT",
-            "description": "TXT records returned for _acme-challenge do not match the configured CNAME target",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "ACME_DNS_TXT_CONFLICT_CLOUDFLARE",
-            "description": "Cloudflare is adding TXT records that conflict with ACME DNS validation",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "DNS_TIMEOUT",
-            "description": "DNS resolution timed out",
             "isDeprecated": false,
             "deprecationReason": null
           }

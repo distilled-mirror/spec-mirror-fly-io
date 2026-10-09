@@ -5750,6 +5750,16 @@
               }
             }
           },
+          "500": {
+            "description": "Password rotation failed, or rotation succeeded but session termination failed (status: sessions_not_terminated)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
           "503": {
             "description": "pg-admin is unavailable; retry after the interval given by the Retry-After header",
             "content": {
@@ -7556,6 +7566,11 @@
           "error": {
             "type": "string",
             "description": "Human-readable error message."
+          },
+          "status": {
+            "type": "string",
+            "description": "Optional machine-readable error status.",
+            "example": "sessions_not_terminated"
           }
         }
       },
