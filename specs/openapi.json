@@ -9412,6 +9412,9 @@
       "fly.ProxyProtoOptions": {
         "type": "object",
         "properties": {
+          "fly_src": {
+            "type": "boolean"
+          },
           "version": {
             "type": "string"
           }
