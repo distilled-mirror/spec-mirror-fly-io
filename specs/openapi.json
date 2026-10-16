@@ -3965,6 +3965,69 @@
         "x-codegen-request-body-name": "request"
       }
     },
+    "/v1/postgres/plans": {
+      "get": {
+        "tags": [
+          "Postgres Clusters"
+        ],
+        "summary": "List Postgres Plans",
+        "description": "List the Managed Postgres plans the caller can choose when creating or forking a cluster in an organization, cheapest first.",
+        "operationId": "Postgres_plans_list",
+        "parameters": [
+          {
+            "name": "org_slug",
+            "in": "query",
+            "description": "Fly Organization Slug, or 'personal' for the caller's personal organization",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/listPostgresPlansResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "org_slug is required and must be a string",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Organization not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/postgres/{postgres_cluster_id}": {
       "get": {
         "tags": [
@@ -4879,7 +4942,7 @@
           "Postgres Clusters"
         ],
         "summary": "Fork Cluster to New Cluster",
-        "description": "Fork a ready Managed Postgres cluster into a new cluster that inherits the source's settings. The source cluster is left unchanged, and the fork is provisioned asynchronously.",
+        "description": "Fork a ready Managed Postgres cluster into a new cluster that inherits the source's settings, on the source's plan unless `plan` is given. The source cluster is left unchanged, and the fork is provisioned asynchronously.",
         "operationId": "Postgres_fork",
         "parameters": [
           {
@@ -4965,7 +5028,7 @@
             }
           },
           "422": {
-            "description": "Invalid attributes",
+            "description": "Invalid attributes, such as an unknown or unavailable plan",
             "content": {
               "application/json": {
                 "schema": {
@@ -7653,6 +7716,47 @@
           }
         }
       },
+      "PostgresPlan": {
+        "type": "object",
+        "properties": {
+          "cpu_kind": {
+            "type": "string",
+            "description": "CPU class.",
+            "example": "shared",
+            "enum": [
+              "shared",
+              "performance"
+            ]
+          },
+          "cpus": {
+            "type": "integer",
+            "description": "vCPUs per node.",
+            "example": 2
+          },
+          "memory_mb": {
+            "type": "integer",
+            "description": "Memory per node in megabytes.",
+            "example": 1024
+          },
+          "monthly_price_usd": {
+            "type": "integer",
+            "description": "Base monthly price in US dollars.",
+            "example": 38
+          },
+          "plan": {
+            "type": "string",
+            "description": "Plan slug. Pass it as `plan` when creating or forking a cluster.",
+            "example": "basic",
+            "enum": [
+              "basic",
+              "starter",
+              "launch",
+              "scale",
+              "Performance"
+            ]
+          }
+        }
+      },
       "PostgresSlowQuery": {
         "type": "object",
         "properties": {
@@ -9624,6 +9728,18 @@
           "name": {
             "type": "string",
             "description": "Name for the forked cluster. Defaults to the source name with a -fork suffix."
+          },
+          "plan": {
+            "type": "string",
+            "description": "Plan slug selecting CPU and memory sizing for the fork. Defaults to the source cluster's plan. Matched case-insensitively.",
+            "example": "launch",
+            "enum": [
+              "basic",
+              "starter",
+              "launch",
+              "scale",
+              "Performance"
+            ]
           }
         }
       },
@@ -9714,6 +9830,17 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PostgresExtension"
+            }
+          }
+        }
+      },
+      "listPostgresPlansResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostgresPlan"
             }
           }
         }

@@ -7207,6 +7207,12 @@
         "inputFields": null,
         "enumValues": [
           {
+            "name": "CAA_RECORD_MISSING_FLY",
+            "description": "CAA records for Let's Encrypt are missing Fly's account URI",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "HTTP_IPV6_REQUIRED",
             "description": "HTTP validation requires IPv6 access to your app",
             "isDeprecated": false,
@@ -7311,12 +7317,6 @@
           {
             "name": "CAA_RECORD_INVALID",
             "description": "CAA records are blocking Let's Encrypt certificate issuance",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "CAA_RECORD_MISSING_FLY",
-            "description": "CAA records for Let's Encrypt are missing Fly's account URI",
             "isDeprecated": false,
             "deprecationReason": null
           }
