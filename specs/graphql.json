@@ -7207,6 +7207,24 @@
         "inputFields": null,
         "enumValues": [
           {
+            "name": "NO_ALLOCATED_IPS",
+            "description": "No IP addresses are allocated to this app",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "IPV6_NOT_ALLOCATED",
+            "description": "Your app does not have any IPv6 records allocated",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CAA_RECORD_INVALID",
+            "description": "CAA records are blocking Let's Encrypt certificate issuance",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "CAA_RECORD_MISSING_FLY",
             "description": "CAA records for Let's Encrypt are missing Fly's account URI",
             "isDeprecated": false,
@@ -7299,24 +7317,6 @@
           {
             "name": "DNS_RECORD_PARTIAL_MATCH",
             "description": "Some DNS records are correct, but others do not match the expected values",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "NO_ALLOCATED_IPS",
-            "description": "No IP addresses are allocated to this app",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "IPV6_NOT_ALLOCATED",
-            "description": "Your app does not have any IPv6 records allocated",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "CAA_RECORD_INVALID",
-            "description": "CAA records are blocking Let's Encrypt certificate issuance",
             "isDeprecated": false,
             "deprecationReason": null
           }

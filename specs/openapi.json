@@ -1032,7 +1032,7 @@
           "Machines"
         ],
         "summary": "Destroy Machine",
-        "description": "Delete a specific Machine within an app by Machine ID, with an optional force parameter to force kill the Machine if it's running.\n",
+        "description": "Delete a specific Machine within an app by Machine ID.\n\nOnly a Machine in the `stopped`, `suspended`, `failed`, `pending` or `archived` state can be deleted. Deleting a Machine in any other state, such as `started`, fails with `412 Precondition Failed` unless you set `force=true`, which kills the Machine first. Deleting a Machine that is already `destroying` or `destroyed` succeeds without doing anything.\n\nIf someone else holds a lease on the Machine, the request fails with `409 Conflict`. Pass the lease nonce in the `fly-machine-lease-nonce` header to delete a Machine you hold the lease on.\n",
         "operationId": "Machines_delete",
         "parameters": [
           {
@@ -1056,7 +1056,7 @@
           {
             "name": "force",
             "in": "query",
-            "description": "Force kill the machine if it's running",
+            "description": "Kill the Machine first if it's not stopped, suspended, failed, pending or archived",
             "schema": {
               "type": "boolean"
             }
@@ -1065,7 +1065,33 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another client holds a lease on the Machine",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "The Machine isn't stopped, suspended, failed, pending or archived, and force isn't set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -1101,7 +1127,13 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -2000,7 +2032,13 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -2057,7 +2095,13 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -2104,7 +2148,13 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartMachineResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -2151,7 +2201,13 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad Request",
@@ -2198,7 +2254,13 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -2234,7 +2296,13 @@
         "responses": {
           "200": {
             "description": "OK",
-            "content": {}
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -2974,6 +3042,7 @@
           "Secrets"
         ],
         "summary": "Update app secrets belonging to an app",
+        "description": "Running Machines don't pick up the change on their own: create or update Machines with `min_secrets_version` set to the returned `version` for them to see it.",
         "operationId": "Secrets_update",
         "parameters": [
           {
@@ -3083,6 +3152,7 @@
           "Secrets"
         ],
         "summary": "Create or update Secret",
+        "description": "Running Machines don't pick up the change on their own: create or update Machines with `min_secrets_version` set to the returned `version` for them to see it.",
         "operationId": "Secret_create",
         "parameters": [
           {
@@ -3144,6 +3214,7 @@
           "Secrets"
         ],
         "summary": "Delete an app secret",
+        "description": "Running Machines don't pick up the change on their own: create or update Machines with `min_secrets_version` set to the returned `version` for them to see it.",
         "operationId": "Secret_delete",
         "parameters": [
           {
@@ -6163,7 +6234,8 @@
             }
           },
           "version": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The app's secrets version after this change. Pass it as `min_secrets_version` when creating or\nupdating Machines so that they are guaranteed to see the change."
           }
         }
       },
@@ -6493,7 +6565,8 @@
             "type": "integer"
           },
           "min_secrets_version": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The minimum version of the app's secrets the Machine must run with. Set it to the `version`\nreturned by the endpoints that set or delete app secrets, so that the Machine is guaranteed\nto see those changes. This field belongs at the top level of the request body, not in\n`config`. If omitted, the app's current secrets version is looked up for you."
           },
           "name": {
             "type": "string",
@@ -6685,7 +6758,8 @@
             "description": "DEPRECATED"
           },
           "version": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The app's secrets version after this change. Pass it as `min_secrets_version` when creating or\nupdating Machines so that they are guaranteed to see the change."
           }
         }
       },
@@ -7087,6 +7161,14 @@
           },
           "version": {
             "type": "string"
+          }
+        }
+      },
+      "OkResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
           }
         }
       },
@@ -7922,7 +8004,8 @@
             "type": "string"
           },
           "version": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The app's secrets version after this change. Pass it as `min_secrets_version` when creating or\nupdating Machines so that they are guaranteed to see the change."
           }
         }
       },
@@ -8016,6 +8099,23 @@
           }
         }
       },
+      "StartMachineResponse": {
+        "type": "object",
+        "properties": {
+          "migrated": {
+            "type": "boolean",
+            "description": "Whether the Machine was moved to another host to be started"
+          },
+          "new_host": {
+            "type": "string",
+            "description": "The host the Machine was moved to, if it was migrated"
+          },
+          "previous_state": {
+            "type": "string",
+            "description": "The state the Machine was in before it was started"
+          }
+        }
+      },
       "StopRequest": {
         "type": "object",
         "properties": {
@@ -8072,7 +8172,8 @@
             "type": "integer"
           },
           "min_secrets_version": {
-            "type": "integer"
+            "type": "integer",
+            "description": "The minimum version of the app's secrets the Machine must run with. Set it to the `version`\nreturned by the endpoints that set or delete app secrets, so that the Machine is guaranteed\nto see those changes. This field belongs at the top level of the request body, not in\n`config`. If omitted, the app's current secrets version is looked up for you."
           },
           "name": {
             "type": "string",
@@ -9000,7 +9101,13 @@
             "description": "Optional boolean telling the Machine to destroy itself once it’s complete (default false)"
           },
           "cache_drive": {
-            "$ref": "#/components/schemas/fly.MachineCacheDrive"
+            "type": "object",
+            "description": "A cache drive attached to the Machine",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/fly.MachineCacheDrive"
+              }
+            ]
           },
           "checks": {
             "type": "object",
@@ -9011,7 +9118,7 @@
           },
           "containers": {
             "type": "array",
-            "description": "Containers are a list of containers that will run in the machine. Currently restricted to\nonly specific organizations.",
+            "description": "Containers are a list of containers that will run in the machine, each from its own image.",
             "items": {
               "$ref": "#/components/schemas/fly.ContainerConfig"
             }
@@ -9021,7 +9128,13 @@
             "description": "Deprecated: use Service.Autostart instead"
           },
           "dns": {
-            "$ref": "#/components/schemas/fly.DNSConfig"
+            "type": "object",
+            "description": "DNS settings for the Machine",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/fly.DNSConfig"
+              }
+            ]
           },
           "env": {
             "type": "object",
@@ -9032,52 +9145,88 @@
           },
           "files": {
             "type": "array",
+            "description": "Files to write into the Machine, from either a raw value or an app secret",
             "items": {
               "$ref": "#/components/schemas/fly.File"
             }
           },
           "guest": {
-            "$ref": "#/components/schemas/fly.MachineGuest"
+            "type": "object",
+            "description": "The resources (CPUs, memory, etc.) allocated to the Machine",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/fly.MachineGuest"
+              }
+            ]
           },
           "image": {
             "type": "string",
             "description": "The docker image to run"
           },
           "init": {
-            "$ref": "#/components/schemas/fly.MachineInit"
+            "type": "object",
+            "description": "Arguments for init, Fly.io's footprint inside the Machine, which controls how your own code is run",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/fly.MachineInit"
+              }
+            ]
           },
           "metadata": {
             "type": "object",
             "additionalProperties": {
               "type": "string"
-            }
+            },
+            "description": "Key/value pairs of Machine metadata. Fly.io uses metadata internally for routing, process groups, and clusters"
           },
           "metrics": {
-            "$ref": "#/components/schemas/fly.MachineMetrics"
+            "type": "object",
+            "description": "An optional metrics endpoint for Prometheus on Fly.io to scrape",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/fly.MachineMetrics"
+              }
+            ]
           },
           "mounts": {
             "type": "array",
+            "description": "Persistent volumes to mount in the Machine. A Machine can mount at most one volume, which must be on\nthe same host. The mounted volume cannot be changed by updating the Machine",
             "items": {
               "$ref": "#/components/schemas/fly.MachineMount"
             }
           },
           "processes": {
             "type": "array",
+            "description": "Multiple processes to run within this one Machine, all from the Machine's image. Unrelated to the\nprocess groups in fly.toml, which run on separate Machines. To run processes from different\nimages, use containers instead",
             "items": {
               "$ref": "#/components/schemas/fly.MachineProcess"
             }
           },
           "restart": {
-            "$ref": "#/components/schemas/fly.MachineRestart"
+            "type": "object",
+            "description": "Whether and how the Machine is restarted after its main process exits",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/fly.MachineRestart"
+              }
+            ]
           },
           "rootfs": {
-            "$ref": "#/components/schemas/fly.MachineRootfs"
+            "type": "object",
+            "description": "The size of the Machine's root filesystem and whether it persists",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/fly.MachineRootfs"
+              }
+            ]
           },
           "schedule": {
-            "type": "string"
+            "type": "string",
+            "description": "Run the Machine at an interval: one of hourly, daily, weekly or monthly. The interval starts when\nthe Machine is created"
           },
           "services": {
             "type": "array",
+            "description": "Network services that Fly Proxy routes traffic to",
             "items": {
               "$ref": "#/components/schemas/fly.MachineService"
             }
@@ -9087,7 +9236,13 @@
             "description": "Deprecated: use Guest instead"
           },
           "spot": {
-            "$ref": "#/components/schemas/fly.MachineSpot"
+            "type": "object",
+            "description": "Spot pricing settings for the Machine",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/fly.MachineSpot"
+              }
+            ]
           },
           "standbys": {
             "type": "array",
@@ -9098,12 +9253,19 @@
           },
           "statics": {
             "type": "array",
+            "description": "Static files to serve under a URL prefix. Fly Proxy routes matching requests to a file server\ninside the Machine, bypassing your application's own process; the Machine must be running. The\nfiles are read either from a path inside the Machine or from a Tigris bucket that belongs to the\napp; no bucket is created for you",
             "items": {
               "$ref": "#/components/schemas/fly.Static"
             }
           },
           "stop_config": {
-            "$ref": "#/components/schemas/fly.StopConfig"
+            "type": "object",
+            "description": "How the Machine is shut down gracefully: the signal sent to it and how long to wait before a hard shutdown",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/fly.StopConfig"
+              }
+            ]
           }
         }
       },
@@ -9558,16 +9720,20 @@
         "type": "object",
         "properties": {
           "guest_path": {
-            "type": "string"
+            "type": "string",
+            "description": "The path inside the Machine, or inside tigris_bucket when set, where the files to serve are located"
           },
           "index_document": {
-            "type": "string"
+            "type": "string",
+            "description": "The document served for requests to the URL prefix or any of its subfolders. Only works with tigris_bucket"
           },
           "tigris_bucket": {
-            "type": "string"
+            "type": "string",
+            "description": "An existing Tigris bucket belonging to the app to read the files from, instead of the Machine's\nfilesystem. The files are still served through the Machine"
           },
           "url_prefix": {
-            "type": "string"
+            "type": "string",
+            "description": "The URL prefix under which the files are served"
           }
         }
       },

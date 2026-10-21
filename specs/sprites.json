@@ -265,6 +265,94 @@
         ],
         "type": "object"
       },
+      "ConnectionUsage": {
+        "description": "Connector usage",
+        "properties": {
+          "daily_series": {
+            "description": "Spend per one-hour bucket since midnight UTC today.",
+            "example": [
+              {
+                "ts": 1760832000,
+                "usd": 0.0123
+              }
+            ],
+            "items": {
+              "$ref": "#/components/schemas/UsagePoint"
+            },
+            "type": "array"
+          },
+          "daily_usd": {
+            "description": "Spend since midnight UTC today in USD.",
+            "example": 0.42,
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "model_breakdown": {
+            "description": "Spend attributed to each model, month to date.",
+            "example": [
+              {
+                "model": "anthropic/claude-sonnet-4",
+                "usd": 1.25
+              }
+            ],
+            "items": {
+              "$ref": "#/components/schemas/UsageModelBreakdown"
+            },
+            "type": "array"
+          },
+          "monthly_series": {
+            "description": "Spend per one-day bucket since the first of the month.",
+            "example": [
+              {
+                "ts": 1760832000,
+                "usd": 0.3
+              }
+            ],
+            "items": {
+              "$ref": "#/components/schemas/UsagePoint"
+            },
+            "type": "array"
+          },
+          "monthly_usd": {
+            "description": "Spend since 00:00 UTC on the first of the month in USD.",
+            "example": 8.75,
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "weekly_series": {
+            "description": "Spend per six-hour bucket since Monday 00:00 UTC of the current week.",
+            "example": [
+              {
+                "ts": 1760832000,
+                "usd": 0.3
+              }
+            ],
+            "items": {
+              "$ref": "#/components/schemas/UsagePoint"
+            },
+            "type": "array"
+          },
+          "weekly_usd": {
+            "description": "Spend since Monday 00:00 UTC of the current week in USD.",
+            "example": 2.1,
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "daily_series",
+          "weekly_series",
+          "monthly_series",
+          "model_breakdown"
+        ],
+        "type": "object"
+      },
       "ServiceLogStdoutEvent": {
         "example": {
           "data": "Server listening on port 3000\n",
@@ -343,6 +431,26 @@
         ],
         "type": "object"
       },
+      "UsageModelBreakdown": {
+        "description": "Usage by model",
+        "properties": {
+          "model": {
+            "description": "Model identifier as reported by the provider.",
+            "example": "anthropic/claude-sonnet-4",
+            "type": "string"
+          },
+          "usd": {
+            "description": "Spend attributed to the model in USD.",
+            "example": 1.25,
+            "type": "number"
+          }
+        },
+        "required": [
+          "model",
+          "usd"
+        ],
+        "type": "object"
+      },
       "UpdateConnectionRequest": {
         "description": "Update connector request",
         "properties": {
@@ -410,6 +518,64 @@
           "data",
           "timestamp"
         ],
+        "type": "object"
+      },
+      "CustomApiTestRequest": {
+        "description": "Custom API connector test request",
+        "properties": {
+          "access_token": {
+            "description": "Credential to test. Required unless `connection_id` supplies the stored one.",
+            "example": "sk-live-...",
+            "type": "string"
+          },
+          "auth_custom_header_name": {
+            "description": "Header name for `auth_method` `custom_header`.",
+            "example": "X-Api-Key",
+            "type": "string"
+          },
+          "auth_header_prefix": {
+            "description": "Prefix for the `Authorization` header value when `auth_method` is `header`.",
+            "example": "Bearer",
+            "type": "string"
+          },
+          "auth_method": {
+            "description": "Where the credential is placed. See the create request for each method. Defaults to `header`.",
+            "enum": [
+              "header",
+              "url_path",
+              "query_param",
+              "custom_header"
+            ],
+            "example": "header",
+            "type": "string"
+          },
+          "auth_query_param_name": {
+            "description": "Query parameter name for `auth_method` `query_param`.",
+            "example": "api_key",
+            "type": "string"
+          },
+          "auth_url_path_template": {
+            "description": "Path template for `auth_method` `url_path`.",
+            "example": "/bot{token}",
+            "type": "string"
+          },
+          "base_api_url": {
+            "description": "Base URL of the provider API. Used to build the request when `auth_method` is `url_path`.",
+            "example": "https://api.acme.example",
+            "type": "string"
+          },
+          "connection_id": {
+            "description": "Existing custom API connector to test. When set, omitted or blank fields fall back to the connector's stored credential and settings, so a stored connector can be re-tested without resending its token.",
+            "example": "conn_abc123",
+            "type": "string"
+          },
+          "test_url": {
+            "description": "URL fetched with the credential attached. For `auth_method` `url_path` give a path relative to `base_api_url` (such as `/me`); the request joins `base_api_url`, the token path and this value, so an absolute URL here would be appended to the base URL. For every other method give an absolute URL. Required unless `connection_id` supplies a stored test URL. URLs that resolve to internal addresses are rejected.",
+            "example": "https://api.acme.example/me",
+            "type": "string"
+          }
+        },
+        "required": [],
         "type": "object"
       },
       "ServiceLogExitEvent": {
@@ -606,6 +772,26 @@
           }
         },
         "required": [],
+        "type": "object"
+      },
+      "UsagePoint": {
+        "description": "Usage series point",
+        "properties": {
+          "ts": {
+            "description": "Unix timestamp in seconds at the start of the bucket.",
+            "example": 1760832000,
+            "type": "integer"
+          },
+          "usd": {
+            "description": "Spend in the bucket in USD.",
+            "example": 0.0123,
+            "type": "number"
+          }
+        },
+        "required": [
+          "ts",
+          "usd"
+        ],
         "type": "object"
       },
       "ApiKeyConnectionRequest": {
@@ -1215,6 +1401,48 @@
         ],
         "type": "object"
       },
+      "ConnectionBalance": {
+        "description": "Managed connector balance",
+        "properties": {
+          "disabled": {
+            "description": "Whether the provider has disabled the managed key.",
+            "example": false,
+            "type": "boolean"
+          },
+          "key_hash": {
+            "description": "Provider identifier of the managed key.",
+            "example": "sk-or-v1-hash",
+            "type": "string"
+          },
+          "limit_usd": {
+            "description": "Spend limit on the managed key in USD. Null when the key has no limit.",
+            "example": 60,
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "remaining_usd": {
+            "description": "Remaining credit in USD. Null when the key has no limit.",
+            "example": 52.999996,
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "usage_usd": {
+            "description": "Spend recorded by the provider against the managed key in USD.",
+            "example": 7.000004,
+            "type": "number"
+          }
+        },
+        "required": [
+          "usage_usd",
+          "disabled",
+          "key_hash"
+        ],
+        "type": "object"
+      },
       "ExecKillSignalEvent": {
         "example": {
           "message": "Signaling SIGTERM to process group 1847",
@@ -1293,6 +1521,85 @@
           }
         },
         "required": [],
+        "type": "object"
+      },
+      "CustomApiConnectionRequest": {
+        "description": "Custom API connector request",
+        "properties": {
+          "access_policy": {
+            "$ref": "#/components/schemas/AccessPolicy",
+            "description": "Initial access policy. Empty or missing policies deny sprite use until updated.",
+            "example": {
+              "allow_all": true
+            }
+          },
+          "access_token": {
+            "description": "Credential sent to the provider. Stored encrypted and never returned by the API.",
+            "example": "sk-live-...",
+            "type": "string"
+          },
+          "auth_custom_header_name": {
+            "description": "Header that carries the credential when `auth_method` is `custom_header`. Defaults to `X-Api-Key`. Reserved hop-by-hop and identity headers are rejected.",
+            "example": "X-Api-Key",
+            "type": "string"
+          },
+          "auth_header_prefix": {
+            "description": "Prefix for the `Authorization` header value when `auth_method` is `header`. Defaults to `Bearer`. An empty string sends the bare credential.",
+            "example": "Bearer",
+            "type": "string"
+          },
+          "auth_method": {
+            "description": "Where the credential is placed on provider requests. `header` sends an `Authorization` header prefixed by `auth_header_prefix`; `url_path` substitutes it into `auth_url_path_template`; `query_param` adds it as the `auth_query_param_name` query parameter; `custom_header` sends it as the `auth_custom_header_name` header. Defaults to `header`.",
+            "enum": [
+              "header",
+              "url_path",
+              "query_param",
+              "custom_header"
+            ],
+            "example": "header",
+            "type": "string"
+          },
+          "auth_query_param_name": {
+            "description": "Query parameter that carries the credential when `auth_method` is `query_param`. Defaults to `api_key`.",
+            "example": "api_key",
+            "type": "string"
+          },
+          "auth_url_path_template": {
+            "description": "Path segment inserted between `base_api_url` and the requested path when `auth_method` is `url_path`. `{token}` is replaced with the credential.",
+            "example": "/bot{token}",
+            "type": "string"
+          },
+          "base_api_url": {
+            "description": "Base URL of the provider API. Gateway paths are appended to it when a sprite calls the connector.",
+            "example": "https://api.acme.example",
+            "type": "string"
+          },
+          "description": {
+            "description": "Free-form description shown in the dashboard.",
+            "example": "Acme production account",
+            "type": "string"
+          },
+          "name": {
+            "description": "Connector name. This is the connector's unique identity within the organization: creating a second custom API connector with the same name updates the existing connector in place rather than creating another one.",
+            "example": "acme-api",
+            "type": "string"
+          },
+          "refresh_token": {
+            "description": "Optional refresh token stored alongside the credential. Stored encrypted and never returned.",
+            "example": "rt-...",
+            "type": "string"
+          },
+          "test_url": {
+            "description": "URL the connector test fetches with the credential attached. For `auth_method` `url_path` give a path relative to `base_api_url` (such as `/me`), because the test joins `base_api_url`, the token path and this value; for every other method give an absolute URL. Stored for later tests; creating a connector does not run the test.",
+            "example": "https://api.acme.example/me",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "base_api_url",
+          "access_token"
+        ],
         "type": "object"
       },
       "Connection": {
@@ -1383,7 +1690,7 @@
             "type": "string"
           },
           "usage_snippet": {
-            "description": "Provider-specific curl snippet showing how to call the connector through the gateway.",
+            "description": "Provider-specific curl snippet showing how to call the connector through the gateway. The host is the deployment's connector gateway origin, which defaults to the API host.",
             "example": "curl https://api.sprites.dev/v1/gateway/slack/conn_abc123/auth.test",
             "type": "string"
           },
@@ -1425,6 +1732,93 @@
         },
         "properties": {
           "comment": {
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "ConnectionBalanceResponse": {
+        "description": "Managed connector balance response",
+        "properties": {
+          "balance": {
+            "$ref": "#/components/schemas/ConnectionBalance",
+            "description": "Balance as reported by the provider.",
+            "example": {
+              "disabled": false,
+              "limit_usd": 60,
+              "remaining_usd": 53,
+              "usage_usd": 7
+            }
+          }
+        },
+        "required": [
+          "balance"
+        ],
+        "type": "object"
+      },
+      "UpdateCustomApiConnectionRequest": {
+        "description": "Update custom API connector request",
+        "properties": {
+          "access_token": {
+            "description": "Replacement credential. Omitted or blank values keep the stored credential and leave `refresh_token` untouched. Stored encrypted and never returned.",
+            "example": "sk-live-...",
+            "type": "string"
+          },
+          "auth_custom_header_name": {
+            "description": "Header name for `auth_method` `custom_header`. Reserved headers are rejected.",
+            "example": "X-Api-Key",
+            "type": "string"
+          },
+          "auth_header_prefix": {
+            "description": "Prefix for the `Authorization` header value when `auth_method` is `header`.",
+            "example": "Bearer",
+            "type": "string"
+          },
+          "auth_method": {
+            "description": "Where the credential is placed on provider requests. See the create request for each method.",
+            "enum": [
+              "header",
+              "url_path",
+              "query_param",
+              "custom_header"
+            ],
+            "example": "header",
+            "type": "string"
+          },
+          "auth_query_param_name": {
+            "description": "Query parameter name for `auth_method` `query_param`.",
+            "example": "api_key",
+            "type": "string"
+          },
+          "auth_url_path_template": {
+            "description": "Path template for `auth_method` `url_path`. `{token}` is replaced with the credential.",
+            "example": "/bot{token}",
+            "type": "string"
+          },
+          "base_api_url": {
+            "description": "Base URL of the provider API.",
+            "example": "https://api.acme.example",
+            "type": "string"
+          },
+          "description": {
+            "description": "Free-form description shown in the dashboard.",
+            "example": "Acme production account",
+            "type": "string"
+          },
+          "name": {
+            "description": "New connector name. The name is the connector's identity within the organization, so it must not collide with another custom API connector.",
+            "example": "acme-api",
+            "type": "string"
+          },
+          "refresh_token": {
+            "description": "Replacement refresh token, applied only together with a non-empty `access_token`; sent on its own it changes nothing. Omit it to keep the stored refresh token. An empty string sent with a new `access_token` stores an empty refresh token.",
+            "example": "rt-...",
+            "type": "string"
+          },
+          "test_url": {
+            "description": "URL the connector test fetches. A path relative to `base_api_url` (such as `/me`) for `auth_method` `url_path`; an absolute URL for every other method.",
+            "example": "https://api.acme.example/me",
             "type": "string"
           }
         },
@@ -1527,6 +1921,24 @@
         ],
         "type": "object"
       },
+      "ConnectionUsageResponse": {
+        "description": "Connector usage response",
+        "properties": {
+          "usage": {
+            "$ref": "#/components/schemas/ConnectionUsage",
+            "description": "Usage from the Sprites gateway's own telemetry. It lags ingestion and may differ from the provider's balance.",
+            "example": {
+              "daily_usd": 0.42,
+              "monthly_usd": 8.75,
+              "weekly_usd": 2.1
+            }
+          }
+        },
+        "required": [
+          "usage"
+        ],
+        "type": "object"
+      },
       "ServiceLogStderrEvent": {
         "example": {
           "data": "Warning: deprecated API usage\n",
@@ -1551,6 +1963,38 @@
           "type",
           "data",
           "timestamp"
+        ],
+        "type": "object"
+      },
+      "CustomApiTestResult": {
+        "description": "Custom API connector test result",
+        "properties": {
+          "latency_ms": {
+            "description": "Round-trip time of the test request. Null when no request was sent.",
+            "example": 42,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "message": {
+            "description": "Human-readable outcome, such as the HTTP status the provider returned.",
+            "example": "HTTP 200 — Connection OK",
+            "type": "string"
+          },
+          "status": {
+            "description": "`ok` when the test URL answered with a 2xx status. Credential and validation failures are reported as `error` inside a 200 response.",
+            "enum": [
+              "ok",
+              "error"
+            ],
+            "example": "ok",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "message"
         ],
         "type": "object"
       },
@@ -1680,6 +2124,24 @@
           "path",
           "entries",
           "count"
+        ],
+        "type": "object"
+      },
+      "CustomApiTestResponse": {
+        "description": "Custom API connector test response",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/CustomApiTestResult",
+            "description": "Test outcome.",
+            "example": {
+              "message": "HTTP 200 — Connection OK",
+              "status": "ok",
+              "latency_ms": 42
+            }
+          }
+        },
+        "required": [
+          "result"
         ],
         "type": "object"
       },
@@ -1885,141 +2347,10 @@
   "info": {
     "title": "Sprites API",
     "version": "0.1.12",
-    "x-sprite-env-version": "0.0.2"
+    "x-sprite-env-version": "0.0.3"
   },
   "openapi": "3.1.0",
   "paths": {
-    "/v1/oauth/connections": {
-      "get": {
-        "description": "List connectors configured for the authenticated organization.",
-        "operationId": "o_auth_connections_index_get",
-        "parameters": [
-          {
-            "description": "Optional provider filter.",
-            "in": "query",
-            "name": "provider",
-            "required": false,
-            "schema": {
-              "description": "Optional provider filter.",
-              "example": "slack",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConnectionListResponse"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "401": {
-            "description": "Missing or invalid authentication"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "List connectors",
-        "tags": [
-          "Connectors"
-        ]
-      }
-    },
-    "/v1/oauth/connections/api_key": {
-      "post": {
-        "description": "Create a connector from a user-provided API key for providers that support key validation.",
-        "operationId": "o_auth_connections_create_api_key_post",
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ApiKeyConnectionRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConnectionResponse"
-                }
-              }
-            },
-            "description": "Created"
-          },
-          "400": {
-            "description": "Invalid request parameters"
-          },
-          "401": {
-            "description": "Missing or invalid authentication"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Create an API-key connector",
-        "tags": [
-          "Connectors"
-        ]
-      }
-    },
-    "/v1/oauth/connections/provision": {
-      "post": {
-        "description": "Provision a system-managed connector for providers that support platform-managed keys.",
-        "operationId": "o_auth_connections_provision_post",
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProvisionConnectionRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConnectionResponse"
-                }
-              }
-            },
-            "description": "Created"
-          },
-          "400": {
-            "description": "Invalid request parameters"
-          },
-          "401": {
-            "description": "Missing or invalid authentication"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Provision a connector",
-        "tags": [
-          "Connectors"
-        ]
-      }
-    },
     "/v1/oauth/connections/{id}": {
       "delete": {
         "description": "Delete a connector and its encrypted credentials.",
@@ -2205,60 +2536,122 @@
         ]
       }
     },
-    "/v1/oauth/{provider}/authorize": {
-      "get": {
-        "description": "Create an OAuth authorization URL for a provider. Use this to start a browser-based consent flow.",
-        "operationId": "o_auth_connections_authorize_get",
+    "/v1/sprites/{name}/exec/{session_id}/kill": {
+      "post": {
+        "description": "Kill an exec session by session ID. Returns streaming NDJSON with kill progress.",
+        "operationId": "sprite_env_kill__exec__session",
         "parameters": [
           {
             "in": "path",
-            "name": "provider",
+            "name": "name",
             "required": true,
             "schema": {
               "type": "string"
             }
           },
           {
-            "description": "Comma-separated scopes to request. Replaces the default scope set for this authorization URL.",
-            "in": "query",
-            "name": "scopes",
-            "required": false,
+            "in": "path",
+            "name": "session_id",
+            "required": true,
             "schema": {
-              "description": "Comma-separated scopes to request. Replaces the default scope set for this authorization URL.",
-              "example": "chat:write,channels:read",
               "type": "string"
             }
           },
           {
-            "description": "Comma-separated scopes to add to any scopes already granted for this provider.",
+            "description": "Signal to send (default: `SIGTERM`)",
             "in": "query",
-            "name": "add_scopes",
+            "name": "signal",
             "required": false,
             "schema": {
-              "description": "Comma-separated scopes to add to any scopes already granted for this provider.",
-              "example": "reactions:write,files:read",
+              "description": "Signal to send (default: `SIGTERM`)",
               "type": "string"
             }
           },
           {
-            "description": "OAuth callback URI. Defaults to the Sprites API callback for the provider.",
+            "description": "Timeout waiting for process to exit (default: `10s`)",
             "in": "query",
-            "name": "redirect_uri",
+            "name": "timeout",
             "required": false,
             "schema": {
-              "description": "OAuth callback URI. Defaults to the Sprites API callback for the provider.",
-              "example": "https://api.sprites.dev/v1/oauth/slack/callback",
-              "type": "string"
+              "description": "Timeout waiting for process to exit (default: `10s`)",
+              "type": "integer"
             }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/x-ndjson": {
+                "example": [
+                  {
+                    "message": "Signaling SIGTERM to process group 1847",
+                    "pid": 1847,
+                    "signal": "SIGTERM",
+                    "type": "signal"
+                  },
+                  {
+                    "message": "Process exited",
+                    "type": "exited"
+                  },
+                  {
+                    "exit_code": 0,
+                    "type": "complete"
+                  }
+                ],
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ExecKillSignalEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ExecKillTimeoutEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ExecKillExitedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ExecKillKilledEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ExecKillErrorEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ExecKillCompleteEvent"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Success - Streaming NDJSON response"
           },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
           {
-            "description": "Optional state value. If omitted, Sprites generates one that ties the callback to the organization.",
-            "in": "query",
-            "name": "state",
-            "required": false,
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Kill Exec Session",
+        "tags": [
+          "Exec"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/checkpoints": {
+      "get": {
+        "description": "List all checkpoints.",
+        "operationId": "sprite_env_list__checkpoints",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
             "schema": {
-              "description": "Optional state value. If omitted, Sprites generates one that ties the callback to the organization.",
-              "example": "opaque-state",
               "type": "string"
             }
           }
@@ -2267,18 +2660,38 @@
           "200": {
             "content": {
               "application/json": {
+                "example": [
+                  {
+                    "comment": "Before database migration",
+                    "create_time": "2026-01-05T10:30:00Z",
+                    "id": "v7"
+                  },
+                  {
+                    "comment": "Stable state",
+                    "create_time": "2026-01-04T15:00:00Z",
+                    "id": "v6"
+                  },
+                  {
+                    "comment": "",
+                    "create_time": "2026-01-04T09:00:00Z",
+                    "id": "v5"
+                  }
+                ],
                 "schema": {
-                  "$ref": "#/components/schemas/OAuthAuthorizeResponse"
+                  "items": {
+                    "$ref": "#/components/schemas/CheckpointInfo"
+                  },
+                  "type": "array"
                 }
               }
             },
             "description": "Success"
           },
-          "400": {
-            "description": "Invalid request parameters"
+          "404": {
+            "description": "Not Found - Resource not found"
           },
-          "401": {
-            "description": "Missing or invalid authentication"
+          "500": {
+            "description": "Internal Server Error"
           }
         },
         "security": [
@@ -2286,31 +2699,22 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Authorize an OAuth connector",
+        "summary": "List Checkpoints",
         "tags": [
-          "Connectors"
+          "Checkpoints"
         ]
       }
     },
-    "/v1/oauth/{provider}/callback": {
+    "/v1/oauth/connections/custom_api": {
       "post": {
-        "description": "Exchange an OAuth authorization code for an encrypted connector.",
-        "operationId": "o_auth_connections_callback_post",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "provider",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "description": "Create a connector for any token-authenticated HTTP API. The connector's `name` is its identity within the organization: creating another custom API connector with the same name updates that connector in place instead of adding a second one. Creating does not test the credential; use the test endpoint for that. Requires full access.",
+        "operationId": "o_auth_connections_create_custom_api_post",
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OAuthCallbackRequest"
+                "$ref": "#/components/schemas/CustomApiConnectionRequest"
               }
             }
           },
@@ -2332,6 +2736,12 @@
           },
           "401": {
             "description": "Missing or invalid authentication"
+          },
+          "403": {
+            "description": "Full access required"
+          },
+          "422": {
+            "description": "Connector could not be stored"
           }
         },
         "security": [
@@ -2339,9 +2749,385 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Complete OAuth authorization",
+        "summary": "Create a custom API connector",
         "tags": [
           "Connectors"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/checkpoints/{checkpoint_id}": {
+      "get": {
+        "description": "Get details of a specific checkpoint.",
+        "operationId": "sprite_env_get__checkpoint",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "checkpoint_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "comment": "Before database migration",
+                  "create_time": "2026-01-05T10:30:00Z",
+                  "id": "v7"
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/CheckpointInfo"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get Checkpoint",
+        "tags": [
+          "Checkpoints"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/fs/list": {
+      "get": {
+        "description": "List directory contents.",
+        "operationId": "sprite_env_list__directory",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Path to the directory to list",
+            "in": "query",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "description": "Path to the directory to list",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Working directory for resolving relative paths",
+            "in": "query",
+            "name": "workingDir",
+            "required": true,
+            "schema": {
+              "description": "Working directory for resolving relative paths",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List Directory",
+        "tags": [
+          "Filesystem"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/services": {
+      "get": {
+        "description": "List all configured services and their current state.",
+        "operationId": "sprite_env_list__services",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "args": [
+                      "-D",
+                      "/var/lib/postgresql/data"
+                    ],
+                    "cmd": "postgres",
+                    "http_port": null,
+                    "name": "postgres",
+                    "needs": [],
+                    "state": {
+                      "name": "postgres",
+                      "pid": 1234,
+                      "started_at": "2026-01-05T08:00:00Z",
+                      "status": "running"
+                    }
+                  },
+                  {
+                    "args": [
+                      "-m",
+                      "http.server",
+                      "8000"
+                    ],
+                    "cmd": "python",
+                    "http_port": 8000,
+                    "name": "webapp",
+                    "needs": [
+                      "postgres"
+                    ],
+                    "state": {
+                      "name": "webapp",
+                      "pid": 1567,
+                      "started_at": "2026-01-05T08:01:00Z",
+                      "status": "running"
+                    }
+                  }
+                ],
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceResponse"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List Services",
+        "tags": [
+          "Services"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/services/{service_name}/restart": {
+      "post": {
+        "description": "Restart a service (stop if running, then start). Returns streaming NDJSON with stop and start progress.",
+        "operationId": "sprite_env_restart__service",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "service_name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Time to monitor logs after starting (default: `5s`)",
+            "in": "query",
+            "name": "duration",
+            "required": false,
+            "schema": {
+              "description": "Time to monitor logs after starting (default: `5s`)",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServiceLogStoppingEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogStoppedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogStdoutEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogStderrEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogExitEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogErrorEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogCompleteEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogStartedEvent"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Success - Streaming NDJSON response"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Restart Service",
+        "tags": [
+          "Services"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/checkpoint": {
+      "post": {
+        "description": "Create a new checkpoint of the current sprite state. Returns streaming NDJSON progress.",
+        "operationId": "sprite_env_create__checkpoint",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckpointRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/x-ndjson": {
+                "example": [
+                  {
+                    "data": "Creating checkpoint...",
+                    "time": "2026-01-05T10:30:00Z",
+                    "type": "info"
+                  },
+                  {
+                    "data": "Stopping services...",
+                    "time": "2026-01-05T10:30:00Z",
+                    "type": "info"
+                  },
+                  {
+                    "data": "Saving filesystem state...",
+                    "time": "2026-01-05T10:30:00Z",
+                    "type": "info"
+                  },
+                  {
+                    "data": "Checkpoint v8 created",
+                    "time": "2026-01-05T10:30:00Z",
+                    "type": "complete"
+                  }
+                ],
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/StreamInfoEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/StreamErrorEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/StreamCompleteEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/StreamKeepaliveEvent"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Success - Streaming NDJSON response"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create Checkpoint",
+        "tags": [
+          "Checkpoints"
         ]
       }
     },
@@ -2449,6 +3235,380 @@
         "summary": "Create a sprite",
         "tags": [
           "Sprites"
+        ]
+      }
+    },
+    "/v1/oauth/connections/{id}/balance": {
+      "get": {
+        "description": "Read the provider's authoritative balance for a managed OpenRouter connector. Only connectors created with the provision endpoint have a balance; bring-your-own-key and OAuth connectors answer 404. Requires an unrestricted token, because the balance is organization-wide financial state.",
+        "operationId": "connection_usage_balance_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionBalanceResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing or invalid authentication"
+          },
+          "403": {
+            "description": "Unrestricted token required"
+          },
+          "404": {
+            "description": "Connector not found or not a managed OpenRouter connector"
+          },
+          "502": {
+            "description": "The provider's management API failed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get a managed connector's balance",
+        "tags": [
+          "Connectors"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/fs/read": {
+      "get": {
+        "description": "Read file contents from the sprite filesystem. Returns raw file bytes.",
+        "operationId": "sprite_env_read__file",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Path to the file to read",
+            "in": "query",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "description": "Path to the file to read",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Working directory for resolving relative paths",
+            "in": "query",
+            "name": "workingDir",
+            "required": true,
+            "schema": {
+              "description": "Working directory for resolving relative paths",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Read File",
+        "tags": [
+          "Filesystem"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/checkpoints/{checkpoint_id}/restore": {
+      "post": {
+        "description": "Restore to a specific checkpoint. Returns streaming NDJSON progress.",
+        "operationId": "sprite_env_restore__checkpoint",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "checkpoint_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/x-ndjson": {
+                "example": [
+                  {
+                    "data": "Restoring to checkpoint v5...",
+                    "time": "2026-01-05T10:30:00Z",
+                    "type": "info"
+                  },
+                  {
+                    "data": "Stopping services...",
+                    "time": "2026-01-05T10:30:00Z",
+                    "type": "info"
+                  },
+                  {
+                    "data": "Restoring filesystem...",
+                    "time": "2026-01-05T10:30:00Z",
+                    "type": "info"
+                  },
+                  {
+                    "data": "Restored to v5",
+                    "time": "2026-01-05T10:30:00Z",
+                    "type": "complete"
+                  }
+                ],
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/StreamInfoEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/StreamErrorEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/StreamCompleteEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/StreamKeepaliveEvent"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Success - Streaming NDJSON response"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Restore Checkpoint",
+        "tags": [
+          "Checkpoints"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/fs/copy": {
+      "post": {
+        "description": "Copy a file or directory.",
+        "operationId": "sprite_env_copy__file_or__directory",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CopyResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request - Invalid request body"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Copy File or Directory",
+        "tags": [
+          "Filesystem"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/policy/resources": {
+      "delete": {
+        "description": "Remove resources policy to revert to default behavior.",
+        "operationId": "sprite_env_delete__resources__policy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request - Invalid request body"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete Resources Policy",
+        "tags": [
+          "Network Policy"
+        ]
+      },
+      "get": {
+        "description": "Get the current resources policy configuration (memory limits).",
+        "operationId": "sprite_env_get__resources__policy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourcesPolicyDoc"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get Resources Policy",
+        "tags": [
+          "Network Policy"
+        ]
+      },
+      "post": {
+        "description": "Update the resources policy configuration to set memory limits.",
+        "operationId": "sprite_env_set__resources__policy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResourcesPolicyDoc"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request - Invalid request body"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set Resources Policy",
+        "tags": [
+          "Network Policy"
         ]
       }
     },
@@ -2583,10 +3743,616 @@
         ]
       }
     },
-    "/v1/sprites/{name}/checkpoint": {
+    "/v1/oauth/connections/provision": {
       "post": {
-        "description": "Create a new checkpoint of the current sprite state. Returns streaming NDJSON progress.",
-        "operationId": "sprite_env_create__checkpoint",
+        "description": "Provision a system-managed connector for providers that support platform-managed keys.",
+        "operationId": "o_auth_connections_provision_post",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProvisionConnectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionResponse"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid request parameters"
+          },
+          "401": {
+            "description": "Missing or invalid authentication"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Provision a connector",
+        "tags": [
+          "Connectors"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/services/{service_name}": {
+      "get": {
+        "description": "Get details of a specific service.",
+        "operationId": "sprite_env_get__service",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "service_name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "args": [
+                    "-m",
+                    "http.server",
+                    "8000"
+                  ],
+                  "cmd": "python",
+                  "http_port": 8000,
+                  "name": "webapp",
+                  "needs": [
+                    "postgres"
+                  ],
+                  "state": {
+                    "name": "webapp",
+                    "pid": 1567,
+                    "started_at": "2026-01-05T08:01:00Z",
+                    "status": "running"
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get Service",
+        "tags": [
+          "Services"
+        ]
+      },
+      "put": {
+        "description": "Create or update a service definition.",
+        "operationId": "sprite_env_create__service",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "service_name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Time to monitor logs after starting (default: `5s`)",
+            "in": "query",
+            "name": "duration",
+            "required": false,
+            "schema": {
+              "description": "Time to monitor logs after starting (default: `5s`)",
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "args": [
+                    "-m",
+                    "http.server",
+                    "8000"
+                  ],
+                  "cmd": "python",
+                  "http_port": 8000,
+                  "name": "webapp",
+                  "needs": [
+                    "postgres"
+                  ],
+                  "state": {
+                    "name": "webapp",
+                    "started_at": "2026-01-05T10:30:00Z",
+                    "status": "starting"
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request - Invalid request body"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create Service",
+        "tags": [
+          "Services"
+        ]
+      }
+    },
+    "/v1/oauth/{provider}/callback": {
+      "post": {
+        "description": "Exchange an OAuth authorization code for an encrypted connector.",
+        "operationId": "o_auth_connections_callback_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuthCallbackRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionResponse"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid request parameters"
+          },
+          "401": {
+            "description": "Missing or invalid authentication"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Complete OAuth authorization",
+        "tags": [
+          "Connectors"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/services/{service_name}/stop": {
+      "post": {
+        "description": "Stop a running service. Returns streaming NDJSON with service stop progress.",
+        "operationId": "sprite_env_stop__service",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "service_name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Timeout waiting for service to stop (default: `10s`)",
+            "in": "query",
+            "name": "timeout",
+            "required": false,
+            "schema": {
+              "description": "Timeout waiting for service to stop (default: `10s`)",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/x-ndjson": {
+                "example": [
+                  {
+                    "timestamp": 1735988400000,
+                    "type": "stopping"
+                  },
+                  {
+                    "exit_code": 0,
+                    "timestamp": 1735988401000,
+                    "type": "stopped"
+                  },
+                  {
+                    "log_files": {
+                      "stdout": "/.sprite/logs/services/webapp.log"
+                    },
+                    "timestamp": 1735988402000,
+                    "type": "complete"
+                  }
+                ],
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ServiceLogStoppingEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogStdoutEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogStderrEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogErrorEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogStoppedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogCompleteEvent"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Success - Streaming NDJSON response"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Stop Service",
+        "tags": [
+          "Services"
+        ]
+      }
+    },
+    "/v1/oauth/{provider}/authorize": {
+      "get": {
+        "description": "Create an OAuth authorization URL for a provider. Use this to start a browser-based consent flow.",
+        "operationId": "o_auth_connections_authorize_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Comma-separated scopes to request. Replaces the default scope set for this authorization URL.",
+            "in": "query",
+            "name": "scopes",
+            "required": false,
+            "schema": {
+              "description": "Comma-separated scopes to request. Replaces the default scope set for this authorization URL.",
+              "example": "chat:write,channels:read",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Comma-separated scopes to add to any scopes already granted for this provider.",
+            "in": "query",
+            "name": "add_scopes",
+            "required": false,
+            "schema": {
+              "description": "Comma-separated scopes to add to any scopes already granted for this provider.",
+              "example": "reactions:write,files:read",
+              "type": "string"
+            }
+          },
+          {
+            "description": "OAuth callback URI. Defaults to the Sprites API callback for the provider.",
+            "in": "query",
+            "name": "redirect_uri",
+            "required": false,
+            "schema": {
+              "description": "OAuth callback URI. Defaults to the Sprites API callback for the provider.",
+              "example": "https://api.sprites.dev/v1/oauth/slack/callback",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Optional state value. If omitted, Sprites generates one that ties the callback to the organization.",
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "description": "Optional state value. If omitted, Sprites generates one that ties the callback to the organization.",
+              "example": "opaque-state",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthAuthorizeResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid request parameters"
+          },
+          "401": {
+            "description": "Missing or invalid authentication"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Authorize an OAuth connector",
+        "tags": [
+          "Connectors"
+        ]
+      }
+    },
+    "/v1/oauth/connections/custom_api/{id}": {
+      "put": {
+        "description": "Update a custom API connector. Every field is optional; omitted fields keep their stored value, and a blank `access_token` keeps the stored credential. Only custom API connectors can be updated here; other providers answer 404. Requires full access.",
+        "operationId": "o_auth_connections_update_custom_api_put",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomApiConnectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid request parameters"
+          },
+          "401": {
+            "description": "Missing or invalid authentication"
+          },
+          "403": {
+            "description": "Full access required"
+          },
+          "404": {
+            "description": "Connector not found"
+          },
+          "422": {
+            "description": "Connector could not be updated"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update a custom API connector",
+        "tags": [
+          "Connectors"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/fs/write": {
+      "put": {
+        "description": "Write file contents to the sprite filesystem. Request body contains raw file bytes.",
+        "operationId": "sprite_env_write__file",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Path to the file to write",
+            "in": "query",
+            "name": "path",
+            "required": true,
+            "schema": {
+              "description": "Path to the file to write",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Working directory for resolving relative paths",
+            "in": "query",
+            "name": "workingDir",
+            "required": true,
+            "schema": {
+              "description": "Working directory for resolving relative paths",
+              "type": "string"
+            }
+          },
+          {
+            "description": "File permissions in octal (e.g., '0644')",
+            "in": "query",
+            "name": "mode",
+            "required": false,
+            "schema": {
+              "description": "File permissions in octal (e.g., '0644')",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Create parent directories if they don't exist",
+            "in": "query",
+            "name": "mkdir",
+            "required": false,
+            "schema": {
+              "description": "Create parent directories if they don't exist",
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "format": "binary",
+                "maxLength": 16777216,
+                "type": "string"
+              }
+            }
+          },
+          "description": "Raw file bytes to write.",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WriteResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request - Invalid request body"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "413": {
+            "description": "Payload Too Large - File contents exceed 16 MiB"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Write File",
+        "tags": [
+          "Filesystem"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/fs/rename": {
+      "post": {
+        "description": "Rename or move a file or directory.",
+        "operationId": "sprite_env_rename__file_or__directory",
         "parameters": [
           {
             "in": "path",
@@ -2601,7 +4367,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateCheckpointRequest"
+                "$ref": "#/components/schemas/RenameRequest"
               }
             }
           },
@@ -2610,112 +4376,17 @@
         "responses": {
           "200": {
             "content": {
-              "application/x-ndjson": {
-                "example": [
-                  {
-                    "data": "Creating checkpoint...",
-                    "time": "2026-01-05T10:30:00Z",
-                    "type": "info"
-                  },
-                  {
-                    "data": "Stopping services...",
-                    "time": "2026-01-05T10:30:00Z",
-                    "type": "info"
-                  },
-                  {
-                    "data": "Saving filesystem state...",
-                    "time": "2026-01-05T10:30:00Z",
-                    "type": "info"
-                  },
-                  {
-                    "data": "Checkpoint v8 created",
-                    "time": "2026-01-05T10:30:00Z",
-                    "type": "complete"
-                  }
-                ],
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/StreamInfoEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/StreamErrorEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/StreamCompleteEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/StreamKeepaliveEvent"
-                    }
-                  ]
-                }
-              }
-            },
-            "description": "Success - Streaming NDJSON response"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Create Checkpoint",
-        "tags": [
-          "Checkpoints"
-        ]
-      }
-    },
-    "/v1/sprites/{name}/checkpoints": {
-      "get": {
-        "description": "List all checkpoints.",
-        "operationId": "sprite_env_list__checkpoints",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
               "application/json": {
-                "example": [
-                  {
-                    "comment": "Before database migration",
-                    "create_time": "2026-01-05T10:30:00Z",
-                    "id": "v7"
-                  },
-                  {
-                    "comment": "Stable state",
-                    "create_time": "2026-01-04T15:00:00Z",
-                    "id": "v6"
-                  },
-                  {
-                    "comment": "",
-                    "create_time": "2026-01-04T09:00:00Z",
-                    "id": "v5"
-                  }
-                ],
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/CheckpointInfo"
-                  },
-                  "type": "array"
+                  "$ref": "#/components/schemas/RenameResponse"
                 }
               }
             },
             "description": "Success"
           },
+          "400": {
+            "description": "Bad Request - Invalid request body"
+          },
           "404": {
             "description": "Not Found - Resource not found"
           },
@@ -2728,16 +4399,16 @@
             "bearerAuth": []
           }
         ],
-        "summary": "List Checkpoints",
+        "summary": "Rename File or Directory",
         "tags": [
-          "Checkpoints"
+          "Filesystem"
         ]
       }
     },
-    "/v1/sprites/{name}/checkpoints/{checkpoint_id}": {
-      "get": {
-        "description": "Get details of a specific checkpoint.",
-        "operationId": "sprite_env_get__checkpoint",
+    "/v1/sprites/{name}/fs/chmod": {
+      "post": {
+        "description": "Change file or directory permissions.",
+        "operationId": "sprite_env_change__file__mode",
         "parameters": [
           {
             "in": "path",
@@ -2746,10 +4417,58 @@
             "schema": {
               "type": "string"
             }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChmodRequest"
+              }
+            }
           },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChmodResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request - Invalid request body"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change File Mode",
+        "tags": [
+          "Filesystem"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/policy/network": {
+      "get": {
+        "description": "Get the current network policy configuration.",
+        "operationId": "sprite_env_get__network__policy",
+        "parameters": [
           {
             "in": "path",
-            "name": "checkpoint_id",
+            "name": "name",
             "required": true,
             "schema": {
               "type": "string"
@@ -2761,12 +4480,23 @@
             "content": {
               "application/json": {
                 "example": {
-                  "comment": "Before database migration",
-                  "create_time": "2026-01-05T10:30:00Z",
-                  "id": "v7"
+                  "rules": [
+                    {
+                      "action": "allow",
+                      "domain": "github.com"
+                    },
+                    {
+                      "action": "allow",
+                      "domain": "*.npmjs.org"
+                    },
+                    {
+                      "action": "deny",
+                      "domain": "*"
+                    }
+                  ]
                 },
                 "schema": {
-                  "$ref": "#/components/schemas/CheckpointInfo"
+                  "$ref": "#/components/schemas/NetworkPolicyRequest"
                 }
               }
             },
@@ -2784,16 +4514,131 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Get Checkpoint",
+        "summary": "Get Network Policy",
         "tags": [
-          "Checkpoints"
+          "Network Policy"
+        ]
+      },
+      "post": {
+        "description": "Update the network policy configuration.",
+        "operationId": "sprite_env_set__network__policy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NetworkPolicyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "rules": [
+                    {
+                      "action": "allow",
+                      "domain": "github.com"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request - Invalid request body"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set Network Policy",
+        "tags": [
+          "Network Policy"
         ]
       }
     },
-    "/v1/sprites/{name}/checkpoints/{checkpoint_id}/restore": {
+    "/v1/sprites/{name}/fs/delete": {
+      "delete": {
+        "description": "Delete a file or directory.",
+        "operationId": "sprite_env_delete__file_or__directory",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request - Invalid request body"
+          },
+          "404": {
+            "description": "Not Found - Resource not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete File or Directory",
+        "tags": [
+          "Filesystem"
+        ]
+      }
+    },
+    "/v1/sprites/{name}/services/{service_name}/start": {
       "post": {
-        "description": "Restore to a specific checkpoint. Returns streaming NDJSON progress.",
-        "operationId": "sprite_env_restore__checkpoint",
+        "description": "Start a service. Returns streaming NDJSON with stdout/stderr.",
+        "operationId": "sprite_env_start__service",
         "parameters": [
           {
             "in": "path",
@@ -2805,10 +4650,20 @@
           },
           {
             "in": "path",
-            "name": "checkpoint_id",
+            "name": "service_name",
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "description": "Time to monitor logs after starting (default: `5s`)",
+            "in": "query",
+            "name": "duration",
+            "required": false,
+            "schema": {
+              "description": "Time to monitor logs after starting (default: `5s`)",
+              "type": "integer"
             }
           }
         ],
@@ -2818,39 +4673,46 @@
               "application/x-ndjson": {
                 "example": [
                   {
-                    "data": "Restoring to checkpoint v5...",
-                    "time": "2026-01-05T10:30:00Z",
-                    "type": "info"
+                    "timestamp": 1735988400000,
+                    "type": "started"
                   },
                   {
-                    "data": "Stopping services...",
-                    "time": "2026-01-05T10:30:00Z",
-                    "type": "info"
+                    "data": "Starting server...\n",
+                    "timestamp": 1735988400000,
+                    "type": "stdout"
                   },
                   {
-                    "data": "Restoring filesystem...",
-                    "time": "2026-01-05T10:30:00Z",
-                    "type": "info"
+                    "data": "Listening on port 8000\n",
+                    "timestamp": 1735988401000,
+                    "type": "stdout"
                   },
                   {
-                    "data": "Restored to v5",
-                    "time": "2026-01-05T10:30:00Z",
+                    "log_files": {
+                      "stdout": "/.sprite/logs/services/webapp.log"
+                    },
+                    "timestamp": 1735988402000,
                     "type": "complete"
                   }
                 ],
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/StreamInfoEvent"
+                      "$ref": "#/components/schemas/ServiceLogStdoutEvent"
                     },
                     {
-                      "$ref": "#/components/schemas/StreamErrorEvent"
+                      "$ref": "#/components/schemas/ServiceLogStderrEvent"
                     },
                     {
-                      "$ref": "#/components/schemas/StreamCompleteEvent"
+                      "$ref": "#/components/schemas/ServiceLogExitEvent"
                     },
                     {
-                      "$ref": "#/components/schemas/StreamKeepaliveEvent"
+                      "$ref": "#/components/schemas/ServiceLogErrorEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogCompleteEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ServiceLogStartedEvent"
                     }
                   ]
                 }
@@ -2870,9 +4732,52 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Restore Checkpoint",
+        "summary": "Start Service",
         "tags": [
-          "Checkpoints"
+          "Services"
+        ]
+      }
+    },
+    "/v1/oauth/connections": {
+      "get": {
+        "description": "List connectors configured for the authenticated organization.",
+        "operationId": "o_auth_connections_index_get",
+        "parameters": [
+          {
+            "description": "Optional provider filter.",
+            "in": "query",
+            "name": "provider",
+            "required": false,
+            "schema": {
+              "description": "Optional provider filter.",
+              "example": "slack",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionListResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "401": {
+            "description": "Missing or invalid authentication"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List connectors",
+        "tags": [
+          "Connectors"
         ]
       }
     },
@@ -3044,131 +4949,16 @@
         ]
       }
     },
-    "/v1/sprites/{name}/exec/{session_id}/kill": {
+    "/v1/oauth/connections/custom_api/test": {
       "post": {
-        "description": "Kill an exec session by session ID. Returns streaming NDJSON with kill progress.",
-        "operationId": "sprite_env_kill__exec__session",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "session_id",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Signal to send (default: `SIGTERM`)",
-            "in": "query",
-            "name": "signal",
-            "required": false,
-            "schema": {
-              "description": "Signal to send (default: `SIGTERM`)",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Timeout waiting for process to exit (default: `10s`)",
-            "in": "query",
-            "name": "timeout",
-            "required": false,
-            "schema": {
-              "description": "Timeout waiting for process to exit (default: `10s`)",
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/x-ndjson": {
-                "example": [
-                  {
-                    "message": "Signaling SIGTERM to process group 1847",
-                    "pid": 1847,
-                    "signal": "SIGTERM",
-                    "type": "signal"
-                  },
-                  {
-                    "message": "Process exited",
-                    "type": "exited"
-                  },
-                  {
-                    "exit_code": 0,
-                    "type": "complete"
-                  }
-                ],
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ExecKillSignalEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ExecKillTimeoutEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ExecKillExitedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ExecKillKilledEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ExecKillErrorEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ExecKillCompleteEvent"
-                    }
-                  ]
-                }
-              }
-            },
-            "description": "Success - Streaming NDJSON response"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Kill Exec Session",
-        "tags": [
-          "Exec"
-        ]
-      }
-    },
-    "/v1/sprites/{name}/fs/chmod": {
-      "post": {
-        "description": "Change file or directory permissions.",
-        "operationId": "sprite_env_change__file__mode",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "description": "Send one request to a custom API's test URL with the credential attached, without storing anything. Pass `connection_id` to test a stored connector, filling in only the fields you want to override. The outcome is in the 200 body: credential failures are `status: error`, not an HTTP error. Requires full access.",
+        "operationId": "o_auth_connections_test_custom_api_post",
+        "parameters": [],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ChmodRequest"
+                "$ref": "#/components/schemas/CustomApiTestRequest"
               }
             }
           },
@@ -3179,20 +4969,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ChmodResponse"
+                  "$ref": "#/components/schemas/CustomApiTestResponse"
                 }
               }
             },
             "description": "Success"
           },
-          "400": {
-            "description": "Bad Request - Invalid request body"
+          "401": {
+            "description": "Missing or invalid authentication"
           },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
+          "403": {
+            "description": "Full access required"
           }
         },
         "security": [
@@ -3200,572 +4987,9 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Change File Mode",
+        "summary": "Test a custom API connector",
         "tags": [
-          "Filesystem"
-        ]
-      }
-    },
-    "/v1/sprites/{name}/fs/chown": {
-      "post": {
-        "description": "Change file or directory ownership.",
-        "operationId": "sprite_env_change__file__owner",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChownRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ChownResponse"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request - Invalid request body"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Change File Owner",
-        "tags": [
-          "Filesystem"
-        ]
-      }
-    },
-    "/v1/sprites/{name}/fs/copy": {
-      "post": {
-        "description": "Copy a file or directory.",
-        "operationId": "sprite_env_copy__file_or__directory",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CopyRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CopyResponse"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request - Invalid request body"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Copy File or Directory",
-        "tags": [
-          "Filesystem"
-        ]
-      }
-    },
-    "/v1/sprites/{name}/fs/delete": {
-      "delete": {
-        "description": "Delete a file or directory.",
-        "operationId": "sprite_env_delete__file_or__directory",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DeleteRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DeleteResponse"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request - Invalid request body"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Delete File or Directory",
-        "tags": [
-          "Filesystem"
-        ]
-      }
-    },
-    "/v1/sprites/{name}/fs/list": {
-      "get": {
-        "description": "List directory contents.",
-        "operationId": "sprite_env_list__directory",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Path to the directory to list",
-            "in": "query",
-            "name": "path",
-            "required": true,
-            "schema": {
-              "description": "Path to the directory to list",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Working directory for resolving relative paths",
-            "in": "query",
-            "name": "workingDir",
-            "required": true,
-            "schema": {
-              "description": "Working directory for resolving relative paths",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ListResponse"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "List Directory",
-        "tags": [
-          "Filesystem"
-        ]
-      }
-    },
-    "/v1/sprites/{name}/fs/read": {
-      "get": {
-        "description": "Read file contents from the sprite filesystem. Returns raw file bytes.",
-        "operationId": "sprite_env_read__file",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Path to the file to read",
-            "in": "query",
-            "name": "path",
-            "required": true,
-            "schema": {
-              "description": "Path to the file to read",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Working directory for resolving relative paths",
-            "in": "query",
-            "name": "workingDir",
-            "required": true,
-            "schema": {
-              "description": "Working directory for resolving relative paths",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Read File",
-        "tags": [
-          "Filesystem"
-        ]
-      }
-    },
-    "/v1/sprites/{name}/fs/rename": {
-      "post": {
-        "description": "Rename or move a file or directory.",
-        "operationId": "sprite_env_rename__file_or__directory",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RenameRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RenameResponse"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request - Invalid request body"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Rename File or Directory",
-        "tags": [
-          "Filesystem"
-        ]
-      }
-    },
-    "/v1/sprites/{name}/fs/write": {
-      "put": {
-        "description": "Write file contents to the sprite filesystem. Request body contains raw file bytes.",
-        "operationId": "sprite_env_write__file",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Path to the file to write",
-            "in": "query",
-            "name": "path",
-            "required": true,
-            "schema": {
-              "description": "Path to the file to write",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Working directory for resolving relative paths",
-            "in": "query",
-            "name": "workingDir",
-            "required": true,
-            "schema": {
-              "description": "Working directory for resolving relative paths",
-              "type": "string"
-            }
-          },
-          {
-            "description": "File permissions in octal (e.g., '0644')",
-            "in": "query",
-            "name": "mode",
-            "required": false,
-            "schema": {
-              "description": "File permissions in octal (e.g., '0644')",
-              "type": "string"
-            }
-          },
-          {
-            "description": "Create parent directories if they don't exist",
-            "in": "query",
-            "name": "mkdir",
-            "required": false,
-            "schema": {
-              "description": "Create parent directories if they don't exist",
-              "type": "boolean"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/octet-stream": {
-              "schema": {
-                "format": "binary",
-                "maxLength": 16777216,
-                "type": "string"
-              }
-            }
-          },
-          "description": "Raw file bytes to write.",
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/WriteResponse"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request - Invalid request body"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "413": {
-            "description": "Payload Too Large - File contents exceed 16 MiB"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Write File",
-        "tags": [
-          "Filesystem"
-        ]
-      }
-    },
-    "/v1/sprites/{name}/policy/network": {
-      "get": {
-        "description": "Get the current network policy configuration.",
-        "operationId": "sprite_env_get__network__policy",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "example": {
-                  "rules": [
-                    {
-                      "action": "allow",
-                      "domain": "github.com"
-                    },
-                    {
-                      "action": "allow",
-                      "domain": "*.npmjs.org"
-                    },
-                    {
-                      "action": "deny",
-                      "domain": "*"
-                    }
-                  ]
-                },
-                "schema": {
-                  "$ref": "#/components/schemas/NetworkPolicyRequest"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Get Network Policy",
-        "tags": [
-          "Network Policy"
-        ]
-      },
-      "post": {
-        "description": "Update the network policy configuration.",
-        "operationId": "sprite_env_set__network__policy",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NetworkPolicyRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "example": {
-                  "rules": [
-                    {
-                      "action": "allow",
-                      "domain": "github.com"
-                    }
-                  ]
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request - Invalid request body"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Set Network Policy",
-        "tags": [
-          "Network Policy"
+          "Connectors"
         ]
       }
     },
@@ -3896,51 +5120,14 @@
         ]
       }
     },
-    "/v1/sprites/{name}/policy/resources": {
-      "delete": {
-        "description": "Remove resources policy to revert to default behavior.",
-        "operationId": "sprite_env_delete__resources__policy",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request - Invalid request body"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Delete Resources Policy",
-        "tags": [
-          "Network Policy"
-        ]
-      },
+    "/v1/oauth/connections/{id}/usage": {
       "get": {
-        "description": "Get the current resources policy configuration (memory limits).",
-        "operationId": "sprite_env_get__resources__policy",
+        "description": "Read gateway spend telemetry for a connector for the current day, week and month to date, with per-model attribution for the month. Windows are calendar periods in UTC: since midnight today, since Monday 00:00 of this week and since the first of the month, not rolling 24-hour, 7-day or 30-day windows. Only provisioned and platform connectors emit gateway metrics; other connectors answer 404. Results are cached for 60 seconds and lag ingestion, so they may differ from the provider's balance. Requires an unrestricted token.",
+        "operationId": "connection_usage_usage_get",
         "parameters": [
           {
             "in": "path",
-            "name": "name",
+            "name": "id",
             "required": true,
             "schema": {
               "type": "string"
@@ -3952,17 +5139,26 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ResourcesPolicyDoc"
+                  "$ref": "#/components/schemas/ConnectionUsageResponse"
                 }
               }
             },
             "description": "Success"
           },
-          "404": {
-            "description": "Not Found - Resource not found"
+          "401": {
+            "description": "Missing or invalid authentication"
           },
-          "500": {
-            "description": "Internal Server Error"
+          "403": {
+            "description": "Unrestricted token required"
+          },
+          "404": {
+            "description": "Connector not found or not a metered connector"
+          },
+          "502": {
+            "description": "The metrics backend did not answer"
+          },
+          "503": {
+            "description": "No metrics backend is configured"
           }
         },
         "security": [
@@ -3970,299 +5166,9 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Get Resources Policy",
+        "summary": "Get a connector's usage",
         "tags": [
-          "Network Policy"
-        ]
-      },
-      "post": {
-        "description": "Update the resources policy configuration to set memory limits.",
-        "operationId": "sprite_env_set__resources__policy",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ResourcesPolicyDoc"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request - Invalid request body"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Set Resources Policy",
-        "tags": [
-          "Network Policy"
-        ]
-      }
-    },
-    "/v1/sprites/{name}/services": {
-      "get": {
-        "description": "List all configured services and their current state.",
-        "operationId": "sprite_env_list__services",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "example": [
-                  {
-                    "args": [
-                      "-D",
-                      "/var/lib/postgresql/data"
-                    ],
-                    "cmd": "postgres",
-                    "http_port": null,
-                    "name": "postgres",
-                    "needs": [],
-                    "state": {
-                      "name": "postgres",
-                      "pid": 1234,
-                      "started_at": "2026-01-05T08:00:00Z",
-                      "status": "running"
-                    }
-                  },
-                  {
-                    "args": [
-                      "-m",
-                      "http.server",
-                      "8000"
-                    ],
-                    "cmd": "python",
-                    "http_port": 8000,
-                    "name": "webapp",
-                    "needs": [
-                      "postgres"
-                    ],
-                    "state": {
-                      "name": "webapp",
-                      "pid": 1567,
-                      "started_at": "2026-01-05T08:01:00Z",
-                      "status": "running"
-                    }
-                  }
-                ],
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/ServiceResponse"
-                  },
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "List Services",
-        "tags": [
-          "Services"
-        ]
-      }
-    },
-    "/v1/sprites/{name}/services/{service_name}": {
-      "get": {
-        "description": "Get details of a specific service.",
-        "operationId": "sprite_env_get__service",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "service_name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "example": {
-                  "args": [
-                    "-m",
-                    "http.server",
-                    "8000"
-                  ],
-                  "cmd": "python",
-                  "http_port": 8000,
-                  "name": "webapp",
-                  "needs": [
-                    "postgres"
-                  ],
-                  "state": {
-                    "name": "webapp",
-                    "pid": 1567,
-                    "started_at": "2026-01-05T08:01:00Z",
-                    "status": "running"
-                  }
-                },
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Get Service",
-        "tags": [
-          "Services"
-        ]
-      },
-      "put": {
-        "description": "Create or update a service definition.",
-        "operationId": "sprite_env_create__service",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "service_name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Time to monitor logs after starting (default: `5s`)",
-            "in": "query",
-            "name": "duration",
-            "required": false,
-            "schema": {
-              "description": "Time to monitor logs after starting (default: `5s`)",
-              "type": "integer"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ServiceRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "example": {
-                  "args": [
-                    "-m",
-                    "http.server",
-                    "8000"
-                  ],
-                  "cmd": "python",
-                  "http_port": 8000,
-                  "name": "webapp",
-                  "needs": [
-                    "postgres"
-                  ],
-                  "state": {
-                    "name": "webapp",
-                    "started_at": "2026-01-05T10:30:00Z",
-                    "status": "starting"
-                  }
-                },
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceResponse"
-                }
-              }
-            },
-            "description": "Success"
-          },
-          "400": {
-            "description": "Bad Request - Invalid request body"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Create Service",
-        "tags": [
-          "Services"
+          "Connectors"
         ]
       }
     },
@@ -4377,79 +5283,37 @@
         ]
       }
     },
-    "/v1/sprites/{name}/services/{service_name}/restart": {
+    "/v1/oauth/connections/api_key": {
       "post": {
-        "description": "Restart a service (stop if running, then start). Returns streaming NDJSON with stop and start progress.",
-        "operationId": "sprite_env_restart__service",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
+        "description": "Create a connector from a user-provided API key for providers that support key validation.",
+        "operationId": "o_auth_connections_create_api_key_post",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiKeyConnectionRequest"
+              }
             }
           },
-          {
-            "in": "path",
-            "name": "service_name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Time to monitor logs after starting (default: `5s`)",
-            "in": "query",
-            "name": "duration",
-            "required": false,
-            "schema": {
-              "description": "Time to monitor logs after starting (default: `5s`)",
-              "type": "integer"
-            }
-          }
-        ],
+          "required": true
+        },
         "responses": {
-          "200": {
+          "201": {
             "content": {
-              "application/x-ndjson": {
+              "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ServiceLogStoppingEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogStoppedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogStdoutEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogStderrEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogExitEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogErrorEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogCompleteEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogStartedEvent"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/ConnectionResponse"
                 }
               }
             },
-            "description": "Success - Streaming NDJSON response"
+            "description": "Created"
           },
-          "404": {
-            "description": "Not Found - Resource not found"
+          "400": {
+            "description": "Invalid request parameters"
           },
-          "500": {
-            "description": "Internal Server Error"
+          "401": {
+            "description": "Missing or invalid authentication"
           }
         },
         "security": [
@@ -4457,16 +5321,16 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Restart Service",
+        "summary": "Create an API-key connector",
         "tags": [
-          "Services"
+          "Connectors"
         ]
       }
     },
-    "/v1/sprites/{name}/services/{service_name}/start": {
+    "/v1/sprites/{name}/fs/chown": {
       "post": {
-        "description": "Start a service. Returns streaming NDJSON with stdout/stderr.",
-        "operationId": "sprite_env_start__service",
+        "description": "Change file or directory ownership.",
+        "operationId": "sprite_env_change__file__owner",
         "parameters": [
           {
             "in": "path",
@@ -4475,78 +5339,31 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "in": "path",
-            "name": "service_name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Time to monitor logs after starting (default: `5s`)",
-            "in": "query",
-            "name": "duration",
-            "required": false,
-            "schema": {
-              "description": "Time to monitor logs after starting (default: `5s`)",
-              "type": "integer"
-            }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChownRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "content": {
-              "application/x-ndjson": {
-                "example": [
-                  {
-                    "timestamp": 1735988400000,
-                    "type": "started"
-                  },
-                  {
-                    "data": "Starting server...\n",
-                    "timestamp": 1735988400000,
-                    "type": "stdout"
-                  },
-                  {
-                    "data": "Listening on port 8000\n",
-                    "timestamp": 1735988401000,
-                    "type": "stdout"
-                  },
-                  {
-                    "log_files": {
-                      "stdout": "/.sprite/logs/services/webapp.log"
-                    },
-                    "timestamp": 1735988402000,
-                    "type": "complete"
-                  }
-                ],
+              "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ServiceLogStdoutEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogStderrEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogExitEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogErrorEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogCompleteEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogStartedEvent"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/ChownResponse"
                 }
               }
             },
-            "description": "Success - Streaming NDJSON response"
+            "description": "Success"
+          },
+          "400": {
+            "description": "Bad Request - Invalid request body"
           },
           "404": {
             "description": "Not Found - Resource not found"
@@ -4560,107 +5377,9 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Start Service",
+        "summary": "Change File Owner",
         "tags": [
-          "Services"
-        ]
-      }
-    },
-    "/v1/sprites/{name}/services/{service_name}/stop": {
-      "post": {
-        "description": "Stop a running service. Returns streaming NDJSON with service stop progress.",
-        "operationId": "sprite_env_stop__service",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "in": "path",
-            "name": "service_name",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Timeout waiting for service to stop (default: `10s`)",
-            "in": "query",
-            "name": "timeout",
-            "required": false,
-            "schema": {
-              "description": "Timeout waiting for service to stop (default: `10s`)",
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "content": {
-              "application/x-ndjson": {
-                "example": [
-                  {
-                    "timestamp": 1735988400000,
-                    "type": "stopping"
-                  },
-                  {
-                    "exit_code": 0,
-                    "timestamp": 1735988401000,
-                    "type": "stopped"
-                  },
-                  {
-                    "log_files": {
-                      "stdout": "/.sprite/logs/services/webapp.log"
-                    },
-                    "timestamp": 1735988402000,
-                    "type": "complete"
-                  }
-                ],
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ServiceLogStoppingEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogStdoutEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogStderrEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogErrorEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogStoppedEvent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ServiceLogCompleteEvent"
-                    }
-                  ]
-                }
-              }
-            },
-            "description": "Success - Streaming NDJSON response"
-          },
-          "404": {
-            "description": "Not Found - Resource not found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Stop Service",
-        "tags": [
-          "Services"
+          "Filesystem"
         ]
       }
     }
