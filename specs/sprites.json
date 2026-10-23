@@ -524,7 +524,7 @@
         "description": "Custom API connector test request",
         "properties": {
           "access_token": {
-            "description": "Credential to test. Required unless `connection_id` supplies the stored one.",
+            "description": "Credential to test. Required unless `connection_id` supplies the stored one, which it does only for a request to the connector's stored origins.",
             "example": "sk-live-...",
             "type": "string"
           },
@@ -565,7 +565,7 @@
             "type": "string"
           },
           "connection_id": {
-            "description": "Existing custom API connector to test. When set, omitted or blank fields fall back to the connector's stored credential and settings, so a stored connector can be re-tested without resending its token.",
+            "description": "Existing custom API connector to test. When set, omitted or blank fields fall back to the connector's stored credential and settings, so a stored connector can be re-tested without resending its token. The stored credential is only sent to the connector's stored `base_api_url` or `test_url` origin (scheme, host and port); testing against any other origin needs `access_token`.",
             "example": "conn_abc123",
             "type": "string"
           },
@@ -938,6 +938,52 @@
         ],
         "type": "object"
       },
+      "UsageBucket": {
+        "description": "Recorded provider usage in one time bucket",
+        "properties": {
+          "cpu_time_sec": {
+            "description": "CPU usage in seconds.",
+            "example": 123.45,
+            "type": "number"
+          },
+          "end": {
+            "description": "Exclusive bucket end in UTC. The final bucket may be shorter.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "last_recorded_at": {
+            "description": "Latest observation in the bucket, or null if none exists.",
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reserved_memory_byte_sec": {
+            "description": "Reserved memory usage in byte-seconds.",
+            "example": 3865470566400,
+            "type": "number"
+          },
+          "sprite_ref": {
+            "description": "Cluster/name, present for single-sprite queries and sprite breakdowns.",
+            "example": "default/demo",
+            "type": "string"
+          },
+          "start": {
+            "description": "Inclusive bucket start in UTC.",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "last_recorded_at",
+          "cpu_time_sec",
+          "reserved_memory_byte_sec"
+        ],
+        "type": "object"
+      },
       "StreamInfoEvent": {
         "example": {
           "data": "Creating checkpoint...",
@@ -966,6 +1012,25 @@
         ],
         "type": "object"
       },
+      "UsageSpritesRequest": {
+        "description": "Historical sprite discovery period",
+        "properties": {
+          "end": {
+            "description": "End time in ISO8601 format. Defaults to now.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "start": {
+            "description": "Start time in ISO8601 format.",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start"
+        ],
+        "type": "object"
+      },
       "NetworkPolicyRequest": {
         "example": {
           "rules": [
@@ -990,6 +1055,34 @@
         },
         "required": [
           "rules"
+        ],
+        "type": "object"
+      },
+      "UsageSpritesResponse": {
+        "description": "Sprites with retained usage observations",
+        "properties": {
+          "end": {
+            "description": "Requested end in UTC.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "sprite_refs": {
+            "description": "Sorted cluster/name references with recorded usage in the period, including deleted sprites.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "start": {
+            "description": "Requested start in UTC.",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "sprite_refs"
         ],
         "type": "object"
       },
@@ -1108,6 +1201,42 @@
         "required": [
           "type",
           "timestamp"
+        ],
+        "type": "object"
+      },
+      "UsageResponse": {
+        "description": "Recorded provider usage in time buckets",
+        "properties": {
+          "end": {
+            "description": "Exclusive end in UTC.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "interval": {
+            "description": "Resolved bucket duration, or null when interval is omitted.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "start": {
+            "description": "Inclusive start in UTC.",
+            "format": "date-time",
+            "type": "string"
+          },
+          "usage": {
+            "description": "Usage buckets ordered by start time and sprite. Missing usage is zero.",
+            "items": {
+              "$ref": "#/components/schemas/UsageBucket"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "interval",
+          "usage"
         ],
         "type": "object"
       },
@@ -1761,7 +1890,7 @@
         "description": "Update custom API connector request",
         "properties": {
           "access_token": {
-            "description": "Replacement credential. Omitted or blank values keep the stored credential and leave `refresh_token` untouched. Stored encrypted and never returned.",
+            "description": "Replacement credential. Omitted or blank values keep the stored credential and leave `refresh_token` untouched; they are rejected with 422 when `base_api_url` or `test_url` moves to an origin the stored credential was not entered for. Stored encrypted and never returned.",
             "example": "sk-live-...",
             "type": "string"
           },
@@ -1812,7 +1941,7 @@
             "type": "string"
           },
           "refresh_token": {
-            "description": "Replacement refresh token, applied only together with a non-empty `access_token`; sent on its own it changes nothing. Omit it to keep the stored refresh token. An empty string sent with a new `access_token` stores an empty refresh token.",
+            "description": "Replacement refresh token, applied only together with a non-empty `access_token`; sent on its own it changes nothing. Omit it to keep the stored refresh token, except when the update moves the connector to a new origin: then the stored refresh token is dropped. An empty string sent with a new `access_token` stores an empty refresh token.",
             "example": "rt-...",
             "type": "string"
           },
@@ -1890,6 +2019,37 @@
         ],
         "type": "object"
       },
+      "UsageRequest": {
+        "description": "Provider usage period",
+        "properties": {
+          "end": {
+            "description": "Exclusive end time in ISO8601 format. Defaults to now.",
+            "example": "2026-10-02T00:00:00Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "group_by": {
+            "description": "Set to sprite for a per-sprite breakdown. Defaults to organization totals.",
+            "example": "sprite",
+            "type": "string"
+          },
+          "interval": {
+            "description": "Bucket duration, such as 1h, or auto. Minimum 1s. Omit for a single total.",
+            "example": "1h",
+            "type": "string"
+          },
+          "start": {
+            "description": "Inclusive start time in ISO8601 format.",
+            "example": "2026-10-01T00:00:00Z",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start"
+        ],
+        "type": "object"
+      },
       "PortNotificationMessage": {
         "properties": {
           "address": {
@@ -1936,6 +2096,37 @@
         },
         "required": [
           "usage"
+        ],
+        "type": "object"
+      },
+      "SpriteUsageRequest": {
+        "description": "Single sprite usage period",
+        "properties": {
+          "cluster_id": {
+            "description": "Sprite's cluster. Defaults to default.",
+            "example": "default",
+            "type": "string"
+          },
+          "end": {
+            "description": "Exclusive end time in ISO8601 format. Defaults to now.",
+            "example": "2026-10-02T00:00:00Z",
+            "format": "date-time",
+            "type": "string"
+          },
+          "interval": {
+            "description": "Bucket duration, such as 1h, or auto. Minimum 1s. Omit for a single total.",
+            "example": "1h",
+            "type": "string"
+          },
+          "start": {
+            "description": "Inclusive start time in ISO8601 format.",
+            "example": "2026-10-01T00:00:00Z",
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start"
         ],
         "type": "object"
       },
@@ -2204,6 +2395,22 @@
             "description": "Organization slug",
             "example": "my-org",
             "type": "string"
+          },
+          "services": {
+            "description": "Compute-provider sprites only: registered services by name. In single-sprite\nresponses, each service with an endpoint also says where it is reached, decided\nwhen the request is handled; lists omit these fields.\n`public_url` (HTTP only) is the service's own public address.\n`exposure` is `public` when that URL answers anonymously, because a service\ngrant admits the `sprite_public_internet` source; `authenticated` when it\nneeds sprite URL auth; `internal` for TCP, which has no public URL.\n`internal_url` is how other sprites in the organization call it, subject\nto a service grant. `grants` lists the service grants that reach it.\n",
+            "example": {
+              "api": {
+                "endpoint": {
+                  "port": 8080,
+                  "protocol": "http"
+                },
+                "exposure": "authenticated",
+                "grants": [],
+                "internal_url": "http://api--my-sprite--default.sprite.internal",
+                "public_url": "https://api--my-sprite--default--my-org.sprites.app"
+              }
+            },
+            "type": "object"
           },
           "status": {
             "description": "Runtime status",
@@ -4187,7 +4394,7 @@
     },
     "/v1/oauth/connections/custom_api/{id}": {
       "put": {
-        "description": "Update a custom API connector. Every field is optional; omitted fields keep their stored value, and a blank `access_token` keeps the stored credential. Only custom API connectors can be updated here; other providers answer 404. Requires full access.",
+        "description": "Update a custom API connector. Every field is optional; omitted fields keep their stored value, and a blank `access_token` keeps the stored credential. Moving `base_api_url` or `test_url` to a new origin (scheme, host or port) requires a new `access_token` in the same request and replaces the stored refresh token with the request's `refresh_token`, if any. Only custom API connectors can be updated here; other providers answer 404. Requires full access.",
         "operationId": "o_auth_connections_update_custom_api_put",
         "parameters": [
           {
@@ -4233,7 +4440,7 @@
             "description": "Connector not found"
           },
           "422": {
-            "description": "Connector could not be updated"
+            "description": "Connector could not be updated, or the destination moved to a new origin without a new `access_token`"
           }
         },
         "security": [
@@ -4346,6 +4553,96 @@
         "summary": "Write File",
         "tags": [
           "Filesystem"
+        ]
+      }
+    },
+    "/v1/usage": {
+      "get": {
+        "description": "CPU and reserved-memory usage for your organization. Use group_by=sprite for a per-sprite breakdown.",
+        "operationId": "usage_index_get",
+        "parameters": [
+          {
+            "description": "Inclusive start time in ISO8601 format.",
+            "in": "query",
+            "name": "start",
+            "required": true,
+            "schema": {
+              "description": "Inclusive start time in ISO8601 format.",
+              "example": "2026-10-01T00:00:00Z",
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Exclusive end time in ISO8601 format. Defaults to now.",
+            "in": "query",
+            "name": "end",
+            "required": false,
+            "schema": {
+              "description": "Exclusive end time in ISO8601 format. Defaults to now.",
+              "example": "2026-10-02T00:00:00Z",
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bucket duration, such as 1h, or auto. Minimum 1s. Omit for a single total.",
+            "in": "query",
+            "name": "interval",
+            "required": false,
+            "schema": {
+              "description": "Bucket duration, such as 1h, or auto. Minimum 1s. Omit for a single total.",
+              "example": "1h",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Set to sprite for a per-sprite breakdown. Defaults to organization totals.",
+            "in": "query",
+            "name": "group_by",
+            "required": false,
+            "schema": {
+              "description": "Set to sprite for a per-sprite breakdown. Defaults to organization totals.",
+              "example": "sprite",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid request parameters"
+          },
+          "401": {
+            "description": "Missing or invalid authentication"
+          },
+          "403": {
+            "description": "usage.read or full access without sprite restrictions is required"
+          },
+          "422": {
+            "description": "Too many results. Choose a larger interval or shorter period."
+          },
+          "502": {
+            "description": "Internal error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Read organization usage",
+        "tags": [
+          "Usage"
         ]
       }
     },
@@ -4576,6 +4873,107 @@
         "summary": "Set Network Policy",
         "tags": [
           "Network Policy"
+        ]
+      }
+    },
+    "/v1/usage/{sprite}": {
+      "get": {
+        "description": "CPU and reserved-memory usage for a sprite. Includes deleted sprites with retained usage.",
+        "operationId": "usage_show_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sprite",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Inclusive start time in ISO8601 format.",
+            "in": "query",
+            "name": "start",
+            "required": true,
+            "schema": {
+              "description": "Inclusive start time in ISO8601 format.",
+              "example": "2026-10-01T00:00:00Z",
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Exclusive end time in ISO8601 format. Defaults to now.",
+            "in": "query",
+            "name": "end",
+            "required": false,
+            "schema": {
+              "description": "Exclusive end time in ISO8601 format. Defaults to now.",
+              "example": "2026-10-02T00:00:00Z",
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Bucket duration, such as 1h, or auto. Minimum 1s. Omit for a single total.",
+            "in": "query",
+            "name": "interval",
+            "required": false,
+            "schema": {
+              "description": "Bucket duration, such as 1h, or auto. Minimum 1s. Omit for a single total.",
+              "example": "1h",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Sprite's cluster. Defaults to default.",
+            "in": "query",
+            "name": "cluster_id",
+            "required": false,
+            "schema": {
+              "description": "Sprite's cluster. Defaults to default.",
+              "example": "default",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid request parameters"
+          },
+          "401": {
+            "description": "Missing or invalid authentication"
+          },
+          "403": {
+            "description": "usage.read or full access without sprite restrictions is required"
+          },
+          "404": {
+            "description": "Sprite not found"
+          },
+          "422": {
+            "description": "Too many results. Choose a larger interval or shorter period."
+          },
+          "502": {
+            "description": "Internal error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Read sprite usage",
+        "tags": [
+          "Usage"
         ]
       }
     },
@@ -4951,7 +5349,7 @@
     },
     "/v1/oauth/connections/custom_api/test": {
       "post": {
-        "description": "Send one request to a custom API's test URL with the credential attached, without storing anything. Pass `connection_id` to test a stored connector, filling in only the fields you want to override. The outcome is in the 200 body: credential failures are `status: error`, not an HTTP error. Requires full access.",
+        "description": "Send one request to a custom API's test URL with the credential attached, without storing anything. Pass `connection_id` to test a stored connector, filling in only the fields you want to override. The stored credential is only sent to the connector's stored `base_api_url` or `test_url` origin (scheme, host and port); to test against any other origin, send the `access_token` again. The outcome is in the 200 body: credential failures are `status: error`, not an HTTP error. Requires full access.",
         "operationId": "o_auth_connections_test_custom_api_post",
         "parameters": [],
         "requestBody": {
@@ -5117,6 +5515,72 @@
         "summary": "Set Privileges Policy",
         "tags": [
           "Network Policy"
+        ]
+      }
+    },
+    "/v1/usage/filters/sprites": {
+      "get": {
+        "description": "List sprites with recorded usage in the requested period, including deleted sprites.",
+        "operationId": "usage_sprites_get",
+        "parameters": [
+          {
+            "description": "Start time in ISO8601 format.",
+            "in": "query",
+            "name": "start",
+            "required": true,
+            "schema": {
+              "description": "Start time in ISO8601 format.",
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "End time in ISO8601 format. Defaults to now.",
+            "in": "query",
+            "name": "end",
+            "required": false,
+            "schema": {
+              "description": "End time in ISO8601 format. Defaults to now.",
+              "format": "date-time",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageSpritesResponse"
+                }
+              }
+            },
+            "description": "Success"
+          },
+          "400": {
+            "description": "Invalid request parameters"
+          },
+          "401": {
+            "description": "Missing or invalid authentication"
+          },
+          "403": {
+            "description": "usage.read or full access without sprite restrictions is required"
+          },
+          "422": {
+            "description": "Too many results. Choose a larger interval or shorter period."
+          },
+          "502": {
+            "description": "Internal error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List sprites with recorded usage",
+        "tags": [
+          "Usage"
         ]
       }
     },
