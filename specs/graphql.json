@@ -7207,6 +7207,24 @@
         "inputFields": null,
         "enumValues": [
           {
+            "name": "OWNERSHIP_VERIFICATION_REQUIRED",
+            "description": "Domain ownership verification is required for HTTP validation behind a CDN or proxy",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "HTTP_HOSTNAME_MISMATCH",
+            "description": "Hostname does not match the certificate request",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DNS_VALIDATION_FAILED",
+            "description": "DNS validation for Let's Encrypt certificate failed",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "ACME_DNS_TXT_CONFLICT",
             "description": "TXT records returned for _acme-challenge do not match the configured CNAME target",
             "isDeprecated": false,
@@ -7299,24 +7317,6 @@
           {
             "name": "HTTP_IPV6_REQUIRED",
             "description": "HTTP validation requires IPv6 access to your app",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "OWNERSHIP_VERIFICATION_REQUIRED",
-            "description": "Domain ownership verification is required for HTTP validation behind a CDN or proxy",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "HTTP_HOSTNAME_MISMATCH",
-            "description": "Hostname does not match the certificate request",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "DNS_VALIDATION_FAILED",
-            "description": "DNS validation for Let's Encrypt certificate failed",
             "isDeprecated": false,
             "deprecationReason": null
           }
