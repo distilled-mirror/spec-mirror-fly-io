@@ -1219,13 +1219,17 @@
               "null"
             ]
           },
+          "partial": {
+            "description": "True when missing minute records were detected. Returned totals include available records only and may understate usage. False means no gaps were detected, not proof of complete collection.",
+            "type": "boolean"
+          },
           "start": {
             "description": "Inclusive start in UTC.",
             "format": "date-time",
             "type": "string"
           },
           "usage": {
-            "description": "Usage buckets ordered by start time and sprite. Missing usage is zero.",
+            "description": "Available usage ordered by start time and sprite. Missing records contribute zero to these sums. Check partial before treating them as complete totals.",
             "items": {
               "$ref": "#/components/schemas/UsageBucket"
             },
@@ -1236,6 +1240,7 @@
           "start",
           "end",
           "interval",
+          "partial",
           "usage"
         ],
         "type": "object"
@@ -1624,7 +1629,7 @@
             "type": "array"
           },
           "blocked_endpoints": {
-            "description": "Provider API paths the connector may not call. Block rules are checked before allow rules.",
+            "description": "Provider API paths the connector may not call, matched without regard to case. Block rules are checked before allow rules.",
             "example": [
               "/admin.*"
             ],
