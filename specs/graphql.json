@@ -7207,18 +7207,6 @@
         "inputFields": null,
         "enumValues": [
           {
-            "name": "CONFLICTING_PORT_443_SERVICES",
-            "description": "Conflicting service definitions found on port 443",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "RATE_LIMITED",
-            "description": "Let's Encrypt rate limit exceeded. Too many certificate requests for this hostname",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "OWNERSHIP_TXT_MISMATCH",
             "description": "Ownership TXT record exists but does not match this app",
             "isDeprecated": false,
@@ -7317,6 +7305,18 @@
           {
             "name": "TLS_HANDLER_MISSING",
             "description": "Service exposing port 443 does not have a TLS handler configured",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CONFLICTING_PORT_443_SERVICES",
+            "description": "Conflicting service definitions found on port 443",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "RATE_LIMITED",
+            "description": "Let's Encrypt rate limit exceeded. Too many certificate requests for this hostname",
             "isDeprecated": false,
             "deprecationReason": null
           }
