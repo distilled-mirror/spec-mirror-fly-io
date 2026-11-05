@@ -7207,42 +7207,6 @@
         "inputFields": null,
         "enumValues": [
           {
-            "name": "OWNERSHIP_TXT_MISMATCH",
-            "description": "Ownership TXT record exists but does not match this app",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "DNS_NOT_CONFIGURED",
-            "description": "DNS records are not configured for this hostname",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "DNS_RECORD_MISMATCH",
-            "description": "DNS records do not match the expected values",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "DNS_RECORD_PARTIAL_MATCH",
-            "description": "Some DNS records are correct, but others do not match the expected values",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "NO_ALLOCATED_IPS",
-            "description": "No IP addresses are allocated to this app",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "IPV6_NOT_ALLOCATED",
-            "description": "Your app does not have any IPv6 records allocated",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "CAA_RECORD_INVALID",
             "description": "CAA records are blocking Let's Encrypt certificate issuance",
             "isDeprecated": false,
@@ -7317,6 +7281,42 @@
           {
             "name": "RATE_LIMITED",
             "description": "Let's Encrypt rate limit exceeded. Too many certificate requests for this hostname",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "OWNERSHIP_TXT_MISMATCH",
+            "description": "Ownership TXT record exists but does not match this app",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DNS_NOT_CONFIGURED",
+            "description": "DNS records are not configured for this hostname",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DNS_RECORD_MISMATCH",
+            "description": "DNS records do not match the expected values",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DNS_RECORD_PARTIAL_MATCH",
+            "description": "Some DNS records are correct, but others do not match the expected values",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NO_ALLOCATED_IPS",
+            "description": "No IP addresses are allocated to this app",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "IPV6_NOT_ALLOCATED",
+            "description": "Your app does not have any IPv6 records allocated",
             "isDeprecated": false,
             "deprecationReason": null
           }
