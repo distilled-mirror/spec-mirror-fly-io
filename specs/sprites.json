@@ -1015,6 +1015,11 @@
       "UsageSpritesRequest": {
         "description": "Historical sprite discovery period",
         "properties": {
+          "cluster_id": {
+            "description": "Limit sprite references to this cluster. Omit for all clusters.",
+            "example": "default",
+            "type": "string"
+          },
           "end": {
             "description": "End time in ISO8601 format. Defaults to now.",
             "format": "date-time",
@@ -2027,6 +2032,11 @@
       "UsageRequest": {
         "description": "Provider usage period",
         "properties": {
+          "cluster_id": {
+            "description": "Limit totals or the sprite breakdown to this cluster. Omit for all clusters.",
+            "example": "default",
+            "type": "string"
+          },
           "end": {
             "description": "Exclusive end time in ISO8601 format. Defaults to now.",
             "example": "2026-10-02T00:00:00Z",
@@ -4563,7 +4573,7 @@
     },
     "/v1/usage": {
       "get": {
-        "description": "CPU and reserved-memory usage for your organization. Use group_by=sprite for a per-sprite breakdown.",
+        "description": "CPU and reserved-memory usage for your organization. Optionally filter by cluster_id. Use group_by=sprite for a per-sprite breakdown.",
         "operationId": "usage_index_get",
         "parameters": [
           {
@@ -4609,6 +4619,17 @@
             "schema": {
               "description": "Set to sprite for a per-sprite breakdown. Defaults to organization totals.",
               "example": "sprite",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Limit totals or the sprite breakdown to this cluster. Omit for all clusters.",
+            "in": "query",
+            "name": "cluster_id",
+            "required": false,
+            "schema": {
+              "description": "Limit totals or the sprite breakdown to this cluster. Omit for all clusters.",
+              "example": "default",
               "type": "string"
             }
           }
@@ -5525,7 +5546,7 @@
     },
     "/v1/usage/filters/sprites": {
       "get": {
-        "description": "List sprites with recorded usage in the requested period, including deleted sprites.",
+        "description": "List sprites with recorded usage in the requested period, including deleted sprites. Optionally filter by cluster_id.",
         "operationId": "usage_sprites_get",
         "parameters": [
           {
@@ -5547,6 +5568,17 @@
             "schema": {
               "description": "End time in ISO8601 format. Defaults to now.",
               "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Limit sprite references to this cluster. Omit for all clusters.",
+            "in": "query",
+            "name": "cluster_id",
+            "required": false,
+            "schema": {
+              "description": "Limit sprite references to this cluster. Omit for all clusters.",
+              "example": "default",
               "type": "string"
             }
           }

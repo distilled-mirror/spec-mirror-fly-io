@@ -481,59 +481,6 @@
             "args": []
           },
           {
-            "name": "apps",
-            "description": "Apps associated with this add-on",
-            "type": {
-              "kind": "OBJECT",
-              "name": "AppConnection",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": [
-              {
-                "name": "after",
-                "description": "Returns the elements in the list that come after the specified cursor.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "before",
-                "description": "Returns the elements in the list that come before the specified cursor.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "first",
-                "description": "Returns the first _n_ elements from the list.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "last",
-                "description": "Returns the last _n_ elements from the list.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              }
-            ]
-          },
-          {
             "name": "createdAt",
             "description": null,
             "type": {
@@ -564,18 +511,6 @@
           {
             "name": "errorMessage",
             "description": "Optional error message when `status` is `error`",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "hostname",
-            "description": "DNS hostname for the add-on",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -1324,26 +1259,6 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "regions",
-            "description": null,
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "Region",
-                  "ofType": null
-                }
-              }
             },
             "isDeprecated": false,
             "deprecationReason": null,
@@ -7207,6 +7122,42 @@
         "inputFields": null,
         "enumValues": [
           {
+            "name": "OWNERSHIP_TXT_MISMATCH",
+            "description": "Ownership TXT record exists but does not match this app",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DNS_NOT_CONFIGURED",
+            "description": "DNS records are not configured for this hostname",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DNS_RECORD_MISMATCH",
+            "description": "DNS records do not match the expected values",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DNS_RECORD_PARTIAL_MATCH",
+            "description": "Some DNS records are correct, but others do not match the expected values",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NO_ALLOCATED_IPS",
+            "description": "No IP addresses are allocated to this app",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "IPV6_NOT_ALLOCATED",
+            "description": "Your app does not have any IPv6 records allocated",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "CAA_RECORD_INVALID",
             "description": "CAA records are blocking Let's Encrypt certificate issuance",
             "isDeprecated": false,
@@ -7281,42 +7232,6 @@
           {
             "name": "RATE_LIMITED",
             "description": "Let's Encrypt rate limit exceeded. Too many certificate requests for this hostname",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "OWNERSHIP_TXT_MISMATCH",
-            "description": "Ownership TXT record exists but does not match this app",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "DNS_NOT_CONFIGURED",
-            "description": "DNS records are not configured for this hostname",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "DNS_RECORD_MISMATCH",
-            "description": "DNS records do not match the expected values",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "DNS_RECORD_PARTIAL_MATCH",
-            "description": "Some DNS records are correct, but others do not match the expected values",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "NO_ALLOCATED_IPS",
-            "description": "No IP addresses are allocated to this app",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "IPV6_NOT_ALLOCATED",
-            "description": "Your app does not have any IPv6 records allocated",
             "isDeprecated": false,
             "deprecationReason": null
           }
@@ -26515,18 +26430,6 @@
                 "name": "String",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "processGroup",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null,
