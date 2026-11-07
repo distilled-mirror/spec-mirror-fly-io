@@ -960,7 +960,7 @@
             ]
           },
           "reserved_memory_byte_sec": {
-            "description": "Reserved memory usage in byte-seconds.",
+            "description": "Reserved memory usage in byte-seconds: max_ram_gb while running, or for a Sprite running with dynamic memory the memory its host measures it holding.",
             "example": 3865470566400,
             "type": "number"
           },
