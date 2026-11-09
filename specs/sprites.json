@@ -1624,7 +1624,7 @@
             "type": "boolean"
           },
           "allowed_endpoints": {
-            "description": "Provider API paths the connector may call. Supports exact paths and trailing `*` prefix wildcards.",
+            "description": "HTTP provider API paths the connector may call. Supports exact paths and trailing `*` prefix wildcards. Database connectors reject endpoint rules.",
             "example": [
               "/chat.*"
             ],
@@ -1634,7 +1634,7 @@
             "type": "array"
           },
           "blocked_endpoints": {
-            "description": "Provider API paths the connector may not call, matched without regard to case. Block rules are checked before allow rules.",
+            "description": "HTTP provider API paths the connector may not call, matched without regard to case. Block rules are checked before allow rules. Database connectors reject endpoint rules.",
             "example": [
               "/admin.*"
             ],
@@ -1760,13 +1760,14 @@
               "oauth",
               "api_key",
               "provisioned",
-              "internal"
+              "internal",
+              "database"
             ],
             "example": "oauth",
             "type": "string"
           },
           "id": {
-            "description": "Connector ID used in gateway URLs.",
+            "description": "Connector ID used in HTTP gateway URLs or as a native database selector.",
             "example": "conn_abc123",
             "type": "string"
           },
@@ -1775,6 +1776,13 @@
             "example": "2026-04-28T12:00:00Z",
             "format": "date-time",
             "type": "string"
+          },
+          "native_connection_uri": {
+            "description": "Credential-free PostgreSQL URI when native ingress is available; otherwise null. Use Sprite discovery for runtime-specific details.",
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "notes": {
             "description": "Provider notes about this connection, derived from its saved settings.",
@@ -1788,6 +1796,10 @@
               "$ref": "#/components/schemas/ProviderNote"
             },
             "type": "array"
+          },
+          "postgres": {
+            "$ref": "#/components/schemas/PostgresDescriptor",
+            "description": "S2 native descriptor: available, host, port, database, non-secret selector username, sslmode and protection. Legacy S1 and unspecified Sprites have no usable endpoint."
           },
           "provider": {
             "description": "Provider key. See https://fly.io/sprites/ecosystem/ for current connectors.",
@@ -1805,7 +1817,7 @@
             "type": "string"
           },
           "provider_info": {
-            "description": "Provider-specific metadata such as workspace URLs, custom API base URLs, or icon references.",
+            "description": "Public provider settings such as workspace URLs, database targets and auth_generation, custom API base URLs, or icon references. Credentials are excluded.",
             "example": {
               "team_domain": "example"
             },
@@ -1822,6 +1834,14 @@
             "format": "date-time",
             "type": "string"
           },
+          "transport": {
+            "description": "The wire protocol this connector requires.",
+            "enum": [
+              "http",
+              "postgres"
+            ],
+            "type": "string"
+          },
           "updated_at": {
             "description": "When the connector was last updated.",
             "example": "2026-04-29T12:00:00Z",
@@ -1829,9 +1849,12 @@
             "type": "string"
           },
           "usage_snippet": {
-            "description": "Provider-specific curl snippet showing how to call the connector through the gateway. The host is the deployment's connector gateway origin, which defaults to the API host.",
+            "description": "Provider-specific HTTP curl snippet using the connector gateway origin, or native PostgreSQL usage. Null when native ingress is unavailable.",
             "example": "curl https://api.sprites.dev/v1/gateway/slack/conn_abc123/auth.test",
-            "type": "string"
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "user_id": {
             "description": "Sprites user ID that created or owns the connector.",
@@ -1962,6 +1985,58 @@
           }
         },
         "required": [],
+        "type": "object"
+      },
+      "PostgresDescriptor": {
+        "description": "Native PostgreSQL descriptor",
+        "properties": {
+          "available": {
+            "description": "Whether this S2 Sprite has enabled native routing. False for legacy S1 Sprites.",
+            "type": "boolean"
+          },
+          "database": {
+            "description": "The immutable saved database name.",
+            "type": "string"
+          },
+          "host": {
+            "description": "S2 internal connector hostname, or null for unsupported or unspecified Sprites.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "port": {
+            "description": "Native ingress port.",
+            "type": "integer"
+          },
+          "protection": {
+            "description": "Transport protecting the Sprite's SQL bytes.",
+            "enum": [
+              "authenticated_platform_tunnel"
+            ],
+            "type": "string"
+          },
+          "sslmode": {
+            "description": "The S2 platform tunnel protects guest traffic; upstream TLS is always verified.",
+            "enum": [
+              "disable"
+            ],
+            "type": "string"
+          },
+          "username": {
+            "description": "Non-secret connector selector, not the upstream SQL role.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "available",
+          "host",
+          "port",
+          "database",
+          "username",
+          "sslmode",
+          "protection"
+        ],
         "type": "object"
       },
       "ServiceLogStoppingEvent": {
