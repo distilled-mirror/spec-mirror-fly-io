@@ -2838,7 +2838,7 @@
           },
           {
             "name": "cnameTarget",
-            "description": "Target to use for for CNAME DNS records",
+            "description": "Target to use for CNAME DNS records",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -3284,18 +3284,6 @@
                 "name": "Boolean",
                 "ofType": null
               }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "instrumentsKey",
-            "description": "Authentication key to use with Instrumentation endpoints",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null,
@@ -6123,6 +6111,12 @@
             "deprecationReason": null
           },
           {
+            "name": "BILLING_SUSPENDED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "CREDITS_EXHAUSTED",
             "description": null,
             "isDeprecated": false,
@@ -7128,12 +7122,6 @@
         "inputFields": null,
         "enumValues": [
           {
-            "name": "IPV6_NOT_ALLOCATED",
-            "description": "Your app does not have any IPv6 records allocated",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "CAA_RECORD_INVALID",
             "description": "CAA records are blocking Let's Encrypt certificate issuance",
             "isDeprecated": false,
@@ -7238,6 +7226,12 @@
           {
             "name": "NO_ALLOCATED_IPS",
             "description": "No IP addresses are allocated to this app",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "IPV6_NOT_ALLOCATED",
+            "description": "Your app does not have any IPv6 records allocated",
             "isDeprecated": false,
             "deprecationReason": null
           }
@@ -7434,7 +7428,7 @@
           },
           {
             "name": "appId",
-            "description": "Application to ID",
+            "description": "Application ID",
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -14398,7 +14392,7 @@
           },
           {
             "name": "requestRegion",
-            "description": "Region current request from",
+            "description": "Region the current request is from",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -14570,7 +14564,7 @@
           },
           {
             "name": "machinesOnly",
-            "description": "Lock the new volume to only usable on machines",
+            "description": "Lock the new volume to only be usable on machines",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -15123,360 +15117,6 @@
             "deprecationReason": null
           }
         ]
-      },
-      {
-        "kind": "OBJECT",
-        "name": "HealthCheck",
-        "description": null,
-        "interfaces": [],
-        "possibleTypes": null,
-        "fields": [
-          {
-            "name": "entity",
-            "description": "Raw name of entity",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "lastPassing",
-            "description": "Time check last passed",
-            "type": {
-              "kind": "SCALAR",
-              "name": "ISO8601DateTime",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "name",
-            "description": "Check name",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "output",
-            "description": "Latest check output",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "state",
-            "description": "Current check state",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          }
-        ],
-        "inputFields": null,
-        "enumValues": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "HealthCheckConnection",
-        "description": "The connection type for HealthCheck.",
-        "interfaces": [],
-        "possibleTypes": null,
-        "fields": [
-          {
-            "name": "edges",
-            "description": "A list of edges.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "HealthCheckEdge",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "nodes",
-            "description": "A list of nodes.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "HealthCheck",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "pageInfo",
-            "description": "Information to aid in pagination.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "PageInfo",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "totalCount",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          }
-        ],
-        "inputFields": null,
-        "enumValues": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "HealthCheckEdge",
-        "description": "An edge in a connection.",
-        "interfaces": [],
-        "possibleTypes": null,
-        "fields": [
-          {
-            "name": "cursor",
-            "description": "A cursor for use in pagination.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "node",
-            "description": "The item at the end of the edge.",
-            "type": {
-              "kind": "OBJECT",
-              "name": "HealthCheck",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          }
-        ],
-        "inputFields": null,
-        "enumValues": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "HealthCheckHandler",
-        "description": null,
-        "interfaces": [],
-        "possibleTypes": null,
-        "fields": [
-          {
-            "name": "name",
-            "description": "Handler name",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "type",
-            "description": "Handler type (Slack or Pagerduty)",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          }
-        ],
-        "inputFields": null,
-        "enumValues": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "HealthCheckHandlerConnection",
-        "description": "The connection type for HealthCheckHandler.",
-        "interfaces": [],
-        "possibleTypes": null,
-        "fields": [
-          {
-            "name": "edges",
-            "description": "A list of edges.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "HealthCheckHandlerEdge",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "nodes",
-            "description": "A list of nodes.",
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "HealthCheckHandler",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "pageInfo",
-            "description": "Information to aid in pagination.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "PageInfo",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "totalCount",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          }
-        ],
-        "inputFields": null,
-        "enumValues": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "HealthCheckHandlerEdge",
-        "description": "An edge in a connection.",
-        "interfaces": [],
-        "possibleTypes": null,
-        "fields": [
-          {
-            "name": "cursor",
-            "description": "A cursor for use in pagination.",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          },
-          {
-            "name": "node",
-            "description": "The item at the end of the edge.",
-            "type": {
-              "kind": "OBJECT",
-              "name": "HealthCheckHandler",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": []
-          }
-        ],
-        "inputFields": null,
-        "enumValues": null
       },
       {
         "kind": "OBJECT",
@@ -22558,120 +22198,6 @@
             ]
           },
           {
-            "name": "healthCheckHandlers",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "HealthCheckHandlerConnection",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": [
-              {
-                "name": "after",
-                "description": "Returns the elements in the list that come after the specified cursor.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "before",
-                "description": "Returns the elements in the list that come before the specified cursor.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "first",
-                "description": "Returns the first _n_ elements from the list.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "last",
-                "description": "Returns the last _n_ elements from the list.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              }
-            ]
-          },
-          {
-            "name": "healthChecks",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "HealthCheckConnection",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null,
-            "args": [
-              {
-                "name": "after",
-                "description": "Returns the elements in the list that come after the specified cursor.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "before",
-                "description": "Returns the elements in the list that come before the specified cursor.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "first",
-                "description": "Returns the first _n_ elements from the list.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "last",
-                "description": "Returns the last _n_ elements from the list.",
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "Int",
-                  "ofType": null
-                },
-                "defaultValue": null
-              }
-            ]
-          },
-          {
             "name": "id",
             "description": null,
             "type": {
@@ -23862,7 +23388,7 @@
           },
           {
             "name": "LOW",
-            "description": "Organization has to prove that is not fraud over time but can use our services",
+            "description": "Organization has to prove that it is not fraud over time but can use our services",
             "isDeprecated": false,
             "deprecationReason": null
           },
@@ -27792,16 +27318,32 @@
             "defaultValue": null
           },
           {
-            "name": "name",
+            "name": "addOnId",
             "description": "The ID of the add-on whose password should be reset",
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "ID",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
+            "description": "The name of the add-on whose password should be reset",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "provider",
+            "description": "The add-on service provider type",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "defaultValue": null
           }
