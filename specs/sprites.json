@@ -951,6 +951,10 @@
             "format": "date-time",
             "type": "string"
           },
+          "hot_storage_byte_sec": {
+            "description": "Resident bytes of the Sprite's own FlyFS segments multiplied by observed running seconds.",
+            "type": "number"
+          },
           "last_recorded_at": {
             "description": "Latest observation in the bucket, or null if none exists.",
             "format": "date-time",
@@ -973,6 +977,41 @@
             "description": "Inclusive bucket start in UTC.",
             "format": "date-time",
             "type": "string"
+          },
+          "storage_byte_sec": {
+            "description": "Estimated retained bytes multiplied by seconds. Each Sprite contributes its own committed FlyFS objects and stored hibernation image. Cluster and organization totals sum their Sprites.",
+            "type": "number"
+          },
+          "storage_delete_requests": {
+            "description": "Metered S3 DELETE and multi-object delete requests. A batch counts once.",
+            "type": "number"
+          },
+          "storage_egress_bytes": {
+            "description": "Response payload bytes returned by the storage gateway, including ranged reads.",
+            "type": "number"
+          },
+          "storage_ingress_bytes": {
+            "description": "Request payload bytes sent through the storage gateway, excluding HTTP and checksum framing.",
+            "type": "number"
+          },
+          "storage_read_requests": {
+            "description": "Metered S3 GET and HEAD requests in the bucket.",
+            "type": "number"
+          },
+          "storage_request_attempts": {
+            "description": "Observed outbound S3 attempts attributed to this owner, including errors and retries.",
+            "type": "number"
+          },
+          "storage_write_requests": {
+            "description": "Metered S3 PUT, COPY and LIST requests in the bucket.",
+            "type": "number"
+          },
+          "suspend_storage_byte_sec": {
+            "description": "Stored hibernation image byte-seconds for this Sprite or the sum across the selected cluster or organization. FlyFS images already contribute to storage_byte_sec. Null when observations do not cover the entire bucket.",
+            "type": [
+              "number",
+              "null"
+            ]
           }
         },
         "required": [
@@ -980,7 +1019,16 @@
           "end",
           "last_recorded_at",
           "cpu_time_sec",
-          "reserved_memory_byte_sec"
+          "reserved_memory_byte_sec",
+          "hot_storage_byte_sec",
+          "storage_byte_sec",
+          "suspend_storage_byte_sec",
+          "storage_request_attempts",
+          "storage_read_requests",
+          "storage_write_requests",
+          "storage_delete_requests",
+          "storage_ingress_bytes",
+          "storage_egress_bytes"
         ],
         "type": "object"
       },
@@ -1225,7 +1273,7 @@
             ]
           },
           "partial": {
-            "description": "True when missing minute records were detected. Returned totals include available records only and may understate usage. False means no gaps were detected, not proof of complete collection.",
+            "description": "True when a retained-storage estimate is incomplete or historical minute records are missing. Totals include the available measurements. The optional suspend storage breakdown reports its own coverage with a null value.",
             "type": "boolean"
           },
           "start": {
@@ -2568,7 +2616,7 @@
   },
   "info": {
     "title": "Sprites API",
-    "version": "0.1.12",
+    "version": "0.1.70",
     "x-sprite-env-version": "0.0.5"
   },
   "openapi": "3.1.0",

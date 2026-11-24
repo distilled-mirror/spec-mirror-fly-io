@@ -6066,6 +6066,12 @@
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "PREPAID_CREDITS_EXHAUSTED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ]
       },
@@ -7067,6 +7073,30 @@
         "inputFields": null,
         "enumValues": [
           {
+            "name": "IPV6_NOT_FOUND",
+            "description": "No AAAA records were found for your domain",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TLS_HANDLER_MISSING",
+            "description": "Service exposing port 443 does not have a TLS handler configured",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CONFLICTING_PORT_443_SERVICES",
+            "description": "Conflicting service definitions found on port 443",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "RATE_LIMITED",
+            "description": "Let's Encrypt rate limit exceeded. Too many certificate requests for this hostname",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "OWNERSHIP_TXT_MISMATCH",
             "description": "Ownership TXT record exists but does not match this app",
             "isDeprecated": false,
@@ -7153,30 +7183,6 @@
           {
             "name": "DNS_TIMEOUT",
             "description": "DNS resolution timed out",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "IPV6_NOT_FOUND",
-            "description": "No AAAA records were found for your domain",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "TLS_HANDLER_MISSING",
-            "description": "Service exposing port 443 does not have a TLS handler configured",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "CONFLICTING_PORT_443_SERVICES",
-            "description": "Conflicting service definitions found on port 443",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "RATE_LIMITED",
-            "description": "Let's Encrypt rate limit exceeded. Too many certificate requests for this hostname",
             "isDeprecated": false,
             "deprecationReason": null
           }
@@ -19661,6 +19667,22 @@
             "args": []
           },
           {
+            "name": "billedByParent",
+            "description": "True when a parent organization pays for this organization",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null,
+            "args": []
+          },
+          {
             "name": "billingStatus",
             "description": null,
             "type": {
@@ -19678,7 +19700,7 @@
           },
           {
             "name": "creditBalance",
-            "description": "The account credits in cents",
+            "description": "The purchased credit balance in cents",
             "type": {
               "kind": "NON_NULL",
               "name": null,
